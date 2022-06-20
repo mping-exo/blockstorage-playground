@@ -1,0 +1,10 @@
+.project
+.settings
+gonbdserver
+*~
+\#*\#
+certs
+nbd/nbd
+nbd/nbd.test
+.vscode
+nbd.file

@@ -1,0 +1,156 @@
+//
+// COPIED FROM https://github.com/exoscale/sos/blob/master/proto/rpc.proto
+// we should find a way for it to be in sync (eg: git submodules, etc)
+//
+syntax = "proto3";
+
+package exoscale.sos;
+option go_package = "github.com/exoscale/sos/proto";
+option java_outer_classname = "BlobProto";
+
+import "google/protobuf/timestamp.proto";
+
+/*
+ * A blob target, identified by partition and ID.
+ * Since blob IDs are timestamped IDs will generally
+ * be large, which voids any benefits gained from using
+ * variable length integers, we use a fixed width version
+ * to account for that.
+ *
+ * The size field is only useful when used in metadata
+ */
+message Blob {
+  int32 partition  = 1;
+  sfixed64 blob_id = 2;
+  int32 size       = 3;
+}
+
+/*
+ * A blob target, with a range to fetch inside the blob.
+ */
+message PartialBlob {
+  Blob blob    = 1;
+  int32 offset = 2;
+  int32 length = 3;
+}
+
+/*
+ * Supported digest types
+ */
+enum DigestType {
+  XHH64 = 0;
+  MD5 = 1;
+}
+
+message Checksum {
+  DigestType type   = 1; // digest type
+  // size of the blob, 16MB maximum
+  int32      size   = 2;
+  // 64 bit digest value for the blob
+  // In case of MD5 (which is 128 bit), this contains the
+  // first 64 bits of the hash
+  int64      digest = 3;
+}
+
+/*
+ * When doing a Get we return a stream of chunks.
+ * The first message in the stream *must* contain a checksum.
+ * This allows the replication and sos to use the same request.
+ *
+ *     [Data, Checksum] -> [Data]
+ */
+message GetChunk {
+  bytes data = 1;
+  Checksum checksum = 2;
+}
+
+/*
+ * GetPartial returns a stream of chunks.
+ * Since we don't see a use for it, no Checksum is returned.
+ * We have used a dedicated type to allow for future extension.
+ */
+message GetPartialChunk {
+  bytes data = 1;
+}
+
+/*
+ * Every request in a blob put operation is a blob chunk.
+ * The first message in the stream *must* contain a Blob,
+ * to indicate which blob to store data for.
+ *
+ * If the first message in the stream contains a checksum,
+ * a check for an existing blob with the same checksum is performed,
+ * immediately returning if it is found.
+ *
+ * It is fine to send all fields at once for small payloads, a typical
+ * sequence for larger uploads will likely look like:
+ *
+ *     [Blob, Data] -> [Data] -> [Data] -> [Data,Checksum]
+ *
+ * Since replication may try to reupload existing blobs, upload should
+ * be split in first Blob and Checksum, then the full blob to allow
+ * the server to discard incoming data when the blob already is present
+ * on disk:
+ *
+ *     [Blob, Checksum] -> [Data]
+ */
+message PutChunk {
+  bytes data        = 1;
+  Checksum checksum = 2;
+  Blob blob         = 3;
+}
+
+// Nothing interesting here, but a type for future compatibility
+message PutResult    {
+}
+
+// Nothing interesting here, but a type for future compatibility
+message DeleteResult {
+}
+
+/*
+ * Blob state in the index DB.
+ */
+enum BlobState {
+  COMMITTED      = 0;
+  DELETED        = 1;
+}
+
+/*
+ * Request to get Blobs metadata from a partiton
+ * at a given partition offset.
+ */
+message GetPartitionMetadataRequest {
+  int32 partition  = 1;
+  int64 offset     = 2;
+}
+
+/*
+ * BlobMeta represents a blob metadata from
+ * the index DB
+ */
+message BlobMeta  {
+  Blob blob                                = 1;
+  int64 offset                             = 2;
+  BlobState state                          = 3;
+  optional google.protobuf.Timestamp dtime = 4;
+}
+
+/*
+ * Response from  GetPartitionMetadataRequest
+ * containing all matched blob int the DB.
+ */
+message GetPartitionMetadataResponse {
+  int64 offset            = 1;
+  repeated BlobMeta blobs = 2;
+}
+
+// The service definition
+service BlobStore {
+  rpc Put         (stream PutChunk) returns (PutResult)     {}
+  rpc GetPartial  (PartialBlob)     returns (stream GetPartialChunk)  {}
+  rpc Get         (Blob)            returns (stream GetChunk)  {}
+  rpc Delete      (Blob)            returns (DeleteResult)  {}
+
+  rpc GetPartitionMetadata  (GetPartitionMetadataRequest) returns (GetPartitionMetadataResponse)  {}
+}

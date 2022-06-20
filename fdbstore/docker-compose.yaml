@@ -1,0 +1,22 @@
+version: "3.5"
+networks:
+  bs:
+    name: "bs_${NETWORK_SUFFIX}"
+    ipam:
+      config:
+        - subnet: 192.0.3.0/24
+
+services:
+  foundation:
+    image: "foundationdb/foundationdb:${FDB_VERSION:-latest}"
+    environment:
+      FDB_NETWORKING_MODE: container
+    entrypoint: ["/usr/bin/tini", "-g", "--", "sh", "/fdb-init.bash"]
+    volumes:
+      - ./docker/foundationdb/fdb-init.bash:/fdb-init.bash
+    networks:
+      bs:
+        ipv4_address: 192.0.3.130
+
+volumes:
+  foundation:

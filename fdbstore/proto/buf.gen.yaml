@@ -1,0 +1,27 @@
+version: v1beta1
+plugins:
+  - name: go
+    out: ./
+    opt: paths=source_relative
+  - name: go-grpc
+    out: ./
+    opt: paths=source_relative
+  - name: marshal-zap
+    out: ./
+    opt: paths=source_relative
+  - name: go-vtproto
+    out: ./
+    opt:
+      - paths=source_relative
+      - features=marshal+unmarshal+size+pool
+      - pool=github.com/exoscale/sos/proto.PutChunk
+      - pool=github.com/exoscale/sos/proto.GetChunk
+      - pool=github.com/exoscale/sos/proto.GetPartialChunk
+      - pool=github.com/exoscale/sos/proto.Blob
+      - pool=github.com/exoscale/sos/proto.Checksum
+      - pool=github.com/exoscale/sos/proto.PartialBlob
+  - name: java
+    out: ./src/
+  - name: java-grpc
+    out: ./src/
+    path: /usr/local/bin/grpc_java_plugin

@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package exoscale.blockstorage;
+option go_package = "github.com/exoscale/blockstorage/proto";
+option java_outer_classname = "BSStore";
+
+import "rpc.proto";
+import "google/protobuf/timestamp.proto";
+
+message RefCountedBlob {
+  exoscale.sos.Blob blob = 1;
+  int32 refcount = 2;
+}
+
+message BlobView {
+  RefCountedBlob rcBlob = 1;
+  int64 blobOffset = 2; // Offset into the referenced Blob
+  int64 blobSize = 3; // Size to consider from the offset
+  int64 extentOffset = 4;
+}
+
+message Extent {
+  string uuid = 1; // volumeid/snapshotId
+  int64 diskOffset = 2; // 0=>0Mb, 16777216=>16Mb
+  repeated BlobView blobViews = 3;
+  bool isSnapshot = 4; // maybe this belongs in orchestrator
+}
+
+/*
+ * The FoundationDB record layer needs to know about every
+ * top level message in an union.
+ */
+message RecordTypeUnion {
+  // RefCountedBlob _RefCountedBlob = 1; // nested
+  // BlobView       _BlobView       = 2; // nested
+  Extent         _Extent         = 3;
+}
