@@ -6,14 +6,15 @@
   (:import [java.util UUID]))
 
 (defn make-extent [uuid disk-offset blob-views]
-  {::uuid        (if (uuid? uuid) uuid (UUID/fromString uuid))
-   ::disk-offset disk-offset
-   ::blob-views  blob-views})
+  {::uuid         (if (uuid? uuid) uuid (UUID/fromString uuid))
+   ::disk-offset  disk-offset
+   ::blob-views   blob-views
+   ::is-snapshot? false})
 
 
 (defprotocol ^:no-doc ExtentStore
   "Extent Metadata store"
   (-get-by-offset [store uuid disk-offset])
   (-get-all [store]
-            [store uuid])
+    [store uuid])
   (-insert [store extent]))

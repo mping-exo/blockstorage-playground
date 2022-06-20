@@ -28,12 +28,11 @@
   `(-run-in-transaction ~store (fn [~sym] ~@fntail)))
 
 
-(defn ^:no-doc ^:private extends-by-uuid-and-offset [uuid disk-offset]
+(defn ^:no-doc ^:private extents-by-uuid-and-offset [uuid disk-offset]
   (query/build-query
     :Extent [:and
              [:= :uuid uuid]
-             [:= :diskOffset disk-offset]
-             [:= :isSnapshot false]]))
+             [:= :diskOffset disk-offset]]))
 
 
 ;; First we define primary keys and indices for the metastore
@@ -42,6 +41,7 @@
    {:primary-key [:concat :type-key
                   "uuid"
                   "diskOffset"]
+    ;; shouldnt uuid+offset be unique?
     :indices     [{:name "uuid"
                    :on   :uuid}]}})
 
@@ -51,7 +51,7 @@
   extent/ExtentStore
   (-get-by-offset [this uuid disk-offset]
     (store/list-query (:store this)
-      (extends-by-uuid-and-offset uuid disk-offset)
+      (extents-by-uuid-and-offset uuid disk-offset)
       {::store/transform p/parse-record}))
   (-get-all
     ([this]
@@ -144,20 +144,3 @@
 
 (s/def ::bsstore (partial satisfies? AtomicMetastore))
 
-(comment
-  (def store (->
-               {:env          "bsstore"
-                :cluster-file "/etc/foundationdb/fdb.cluster"}
-               (make-bsstore)
-               (component/start)))
-
-  @(-run-in-transaction store
-     (fn [s] (extent/-get-by-offset s "" 0)))
-
-  @(-run-in-transaction store
-     (fn [s] (extent/-get-all s)))
-
-  (-run-in-transaction store
-    (fn [s] (extent/-insert s (extent/make-extent (str (UUID/randomUUID)) 0 []))))
-
-  "")

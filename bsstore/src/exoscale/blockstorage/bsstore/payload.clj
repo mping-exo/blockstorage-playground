@@ -95,11 +95,12 @@
 
 (defn ^BSStore$Extent extent->record
   "Serialize an refcounted blob to protobuf"
-  [{::extent/keys [uuid disk-offset blob-views] :as extent}]
+  [{::extent/keys [uuid disk-offset blob-views is-snapshot?] :as extent}]
   ;(ex/assert-spec-valid ::bsstore/extent extent)
   (let [b (BSStore$Extent/newBuilder)]
     (.setUuid b (str uuid))
     (.setDiskOffset b disk-offset)
+    (.setIsSnapshot b (or is-snapshot? false))
     (.addAllBlobViews b (mapv blobview->record blob-views))
     (.build b)))
 
@@ -138,9 +139,10 @@
 
 (defn record->extent
   [^BSStore$ExtentOrBuilder payload]
-  #::extent{:uuid        (UUID/fromString (.getUuid payload))
-            :disk-offset (.getDiskOffset payload)
-            :blob-views  (mapv record->blobview (.getBlobViewsList payload))})
+  #::extent{:uuid         (UUID/fromString (.getUuid payload))
+            :disk-offset  (.getDiskOffset payload)
+            :blob-views   (mapv record->blobview (.getBlobViewsList payload))
+            :is-snapshot? (.getIsSnapshot payload)})
 
 ;; Mostly mechanical implementations of the protocols defined up top
 
