@@ -1,9 +1,9 @@
 # Blockstorage Playground
 
-## FDBStore
+## BS Store
 
 Playground for FDB & blockstorage schema
 
-## GONBDServer
+## Go NBD Server
 
 Playground for golang NBD server implementation
