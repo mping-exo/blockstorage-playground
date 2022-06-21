@@ -22,7 +22,12 @@
 
 ;; First we define primary keys and indices for the metastore
 (def ^:private schema
-  {:Extent
+  {:RefCountedBlob
+   {:primary-key [:concat :type-key
+                  [:nested "blob" "partition"]
+                  [:nested "blob" "blob_id"]]}
+
+   :Extent
    {:primary-key [:concat :type-key
                   "uuid"
                   "diskOffset"]
@@ -127,4 +132,3 @@
                           :schema       schema})))
 
 (s/def ::bsstore (partial satisfies? bs/AtomicMetastore))
-
