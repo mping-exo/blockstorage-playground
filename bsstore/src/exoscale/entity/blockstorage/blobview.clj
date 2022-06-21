@@ -4,9 +4,9 @@
             [exoscale.entity.blockstorage.spec :as spec]))
 
 (s/def ::rcblob ::rcblob/rcblob)
-(s/def ::blob-offset spec/pos-num?)
-(s/def ::blob-size spec/pos-num?)
-(s/def ::extent-offset spec/pos-num?)
+(s/def ::blob-offset ::spec/offset)
+(s/def ::blob-size ::spec/offset)
+(s/def ::extent-offset ::spec/offset)
 (s/def ::blobview (s/keys :req [::rcblob ::blob-offset ::blob-size ::extent-offset]))
 
 (defn make-blobview [rcblob blob-offset blob-size extent-offset]

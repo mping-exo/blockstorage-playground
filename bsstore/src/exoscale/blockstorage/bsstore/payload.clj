@@ -78,7 +78,7 @@
   (ex/assert-spec-valid ::blockstorage/rcblob rcblob)
   (let [b (BSStore$RefCountedBlob/newBuilder)]
     (.setBlob b (blob->record blob))
-    (.setRefcount refcount)
+    (.setRefcount b refcount)
     (.build b)))
 
 (defn ^BSStore$BlobView blobview->record

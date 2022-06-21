@@ -2,10 +2,10 @@
   (:require [clojure.spec.alpha :as s]
             [exoscale.entity.sos.blob :as blob]))
 
-(s/def ::refcount number?)
+(s/def ::refcount nat-int?)
 (s/def ::blob ::blob/blob)
-(s/def ::rcblob (s/keys :req-un [::blob ::refcount]))
+(s/def ::rcblob (s/keys :req [::blob ::refcount]))
 
 (defn make-rcblob [blob refcount]
-  {::blob blob
+  {::blob     blob
    ::refcount refcount})

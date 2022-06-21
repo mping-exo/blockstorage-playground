@@ -5,7 +5,7 @@
   (:import [java.util UUID]))
 
 (s/def ::uuid uuid?)
-(s/def ::disk-offset spec/pos-num?)
+(s/def ::disk-offset ::spec/offset)
 (s/def ::blob-views (s/coll-of ::bv/blobview))
 (s/def ::is-snapshot? boolean?)
 
