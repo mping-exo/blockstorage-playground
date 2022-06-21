@@ -5,35 +5,20 @@
             [clojure.repl :refer [demunge]]
             [clojure.string :as str]
             [com.stuartsierra.component :as component]
-            [exoscale.entity.sos :as sos]
+            [exoscale.entity.blockstorage :as bs]
             [exoscale.blockstorage.bsstore.payload :as p]
             [exoscale.entity.blockstorage.extent :as extent]
             [exoscale.vinyl.query :as query]
             [exoscale.vinyl.store :as store]
             [telemetric-clj.macros :refer [with-span-attrs]])
-  (:import exoscale.blockstorage.BSStore
-           [java.util UUID]))
+  (:import exoscale.blockstorage.BSStore))
 
-(defprotocol ^:no-doc AtomicMetastore
-  "The main protocol the underlying transactables should implement"
-  (-reduce-extents [this uuid reducer init opts]
-    "Reduce over extents with a transformation of f(xf).")
-  (-run-in-transaction [this f]
-    "Run `f` over an implementation of all known metadata protocols:
-     - `extent/ExtentStore`"))
-
-(defmacro with-transaction
-  "Perform provided in the context of a transaction against the store"
-  [[sym store] & fntail]
-  `(-run-in-transaction ~store (fn [~sym] ~@fntail)))
-
-
+;; TODO use params?
 (defn ^:no-doc ^:private extents-by-uuid-and-offset [uuid disk-offset]
   (query/build-query
     :Extent [:and
-             [:= :uuid uuid]
+             [:= :uuid (str uuid)]
              [:= :diskOffset disk-offset]]))
-
 
 ;; First we define primary keys and indices for the metastore
 (def ^:private schema
@@ -41,7 +26,6 @@
    {:primary-key [:concat :type-key
                   "uuid"
                   "diskOffset"]
-    ;; shouldnt uuid+offset be unique?
     :indices     [{:name "uuid"
                    :on   :uuid}]}})
 
@@ -67,7 +51,7 @@
       (p/map->record :Extent extent))))
 
 ;;;;
-;;
+;; store def
 
 (defn build-bsstore [store] (->VinylMetastore store))
 
@@ -110,7 +94,7 @@
     (when (some? db)
       (store/stop db))
     (assoc this :db nil))
-  AtomicMetastore
+  bs/AtomicMetastore
   (-run-in-transaction [_ f]
     (do                                                     ;with-span-attrs "metastore/run-in-transaction" {:nest? false :attrs {:function (function->str f)}}
       (run-store-fn db f)))
@@ -142,5 +126,5 @@
                           :descriptor   (BSStore/getDescriptor)
                           :schema       schema})))
 
-(s/def ::bsstore (partial satisfies? AtomicMetastore))
+(s/def ::bsstore (partial satisfies? bs/AtomicMetastore))
 

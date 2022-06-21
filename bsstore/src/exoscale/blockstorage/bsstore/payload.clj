@@ -10,9 +10,8 @@
    If you change stuff here, don't forget to update the generative tests
    in `payload_test.clj` as well."
   (:require [exoscale.entity.sos :as sos]
+            [exoscale.entity.blockstorage :as blockstorage]
             [exoscale.entity.sos.blob :as blob]
-            [exoscale.entity.sos.chunk :as chunk]
-            [exoscale.entity.sos.checksum :as checksum]
             [exoscale.entity.blockstorage.blobview :as blobview]
             [exoscale.entity.blockstorage.rcblob :as rcblob]
             [exoscale.entity.blockstorage.extent :as extent]
@@ -76,7 +75,7 @@
 (defn ^BSStore$RefCountedBlob rcblob->record
   "Serialize an refcounted blob to protobuf"
   [{::rcblob/keys [blob refcount] :as rcblob}]
-  ;(ex/assert-spec-valid ::bsstore/rcblob rcblob)
+  (ex/assert-spec-valid ::blockstorage/rcblob rcblob)
   (let [b (BSStore$RefCountedBlob/newBuilder)]
     (.setBlob b (blob->record blob))
     (.setRefcount refcount)
@@ -85,7 +84,7 @@
 (defn ^BSStore$BlobView blobview->record
   "Serialize an refcounted blob to protobuf"
   [{::blobview/keys [rcblob blob-offset blob-size extent-offset] :as blobview}]
-  ;(ex/assert-spec-valid ::bsstore/blobview blobview)
+  (ex/assert-spec-valid ::blockstorage/blobview blobview)
   (let [b (BSStore$BlobView/newBuilder)]
     (.setRcBlob b (rcblob->record rcblob))
     (.setBlobOffset b blob-offset)
@@ -96,7 +95,7 @@
 (defn ^BSStore$Extent extent->record
   "Serialize an refcounted blob to protobuf"
   [{::extent/keys [uuid disk-offset blob-views is-snapshot?] :as extent}]
-  ;(ex/assert-spec-valid ::bsstore/extent extent)
+  (ex/assert-spec-valid ::blockstorage/extent extent)
   (let [b (BSStore$Extent/newBuilder)]
     (.setUuid b (str uuid))
     (.setDiskOffset b disk-offset)
