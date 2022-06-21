@@ -19,7 +19,27 @@ docker pull registry.internal.exoscale.ch/exoscale/buf
 docker run --rm -v `pwd`/proto:/defs registry.internal.exoscale.ch/exoscale/buf generate
 ```
 
+## FDB layout
+                  
+#### Extent
+```
+                   +-----------------------------------------------+----------+
+<UUID, diskOffset> | BlobView1                                     |BlobView N|
+                   +-----------------------------+--------+--------+----------+
+                   | PartialBlob                 |<Offset>|<Length>|   ...    |
+                   | <PartitionId, BlobId, Size> |        |        |   ...    |
+                   +-----------------------------+--------+--------+----------+
+```
+
+#### RefCountedBlob
+
+```
+                      +-------+
+<PartitionId, BlobId> |<Size> |
+                      +-------+
+```
+
 ## TODO
 
 - [ ] validate schema
-- [ ] find a way to reference `blob.prot`?
+- [ ] find a way to reference `blob.proto`?

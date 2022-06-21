@@ -710,42 +710,40 @@ public final class BSStore {
       com.google.protobuf.MessageOrBuilder {
 
     /**
-     * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-     * @return Whether the rcBlob field is set.
-     */
-    boolean hasRcBlob();
-    /**
-     * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-     * @return The rcBlob.
-     */
-    exoscale.blockstorage.BSStore.RefCountedBlob getRcBlob();
-    /**
-     * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-     */
-    exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder getRcBlobOrBuilder();
-
-    /**
      * <pre>
-     * Offset into the referenced Blob
+     * Blob ids are {partition,id}
+     * the Blob itself is id+size, might as well store the whole thing
+     * PartialBlob is blob+offset+length
      * </pre>
      *
-     * <code>int64 blobOffset = 2 [json_name = "blobOffset"];</code>
-     * @return The blobOffset.
+     * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+     * @return Whether the partialBlob field is set.
      */
-    long getBlobOffset();
-
+    boolean hasPartialBlob();
     /**
      * <pre>
-     * Size to consider from the offset
+     * Blob ids are {partition,id}
+     * the Blob itself is id+size, might as well store the whole thing
+     * PartialBlob is blob+offset+length
      * </pre>
      *
-     * <code>int64 blobSize = 3 [json_name = "blobSize"];</code>
-     * @return The blobSize.
+     * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+     * @return The partialBlob.
      */
-    long getBlobSize();
+    exoscale.sos.BlobProto.PartialBlob getPartialBlob();
+    /**
+     * <pre>
+     * Blob ids are {partition,id}
+     * the Blob itself is id+size, might as well store the whole thing
+     * PartialBlob is blob+offset+length
+     * </pre>
+     *
+     * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+     */
+    exoscale.sos.BlobProto.PartialBlobOrBuilder getPartialBlobOrBuilder();
 
     /**
-     * <code>int64 extentOffset = 4 [json_name = "extentOffset"];</code>
+     * <code>int64 extentOffset = 2 [json_name = "extentOffset"];</code>
      * @return The extentOffset.
      */
     long getExtentOffset();
@@ -796,29 +794,19 @@ public final class BSStore {
               done = true;
               break;
             case 10: {
-              exoscale.blockstorage.BSStore.RefCountedBlob.Builder subBuilder = null;
-              if (rcBlob_ != null) {
-                subBuilder = rcBlob_.toBuilder();
+              exoscale.sos.BlobProto.PartialBlob.Builder subBuilder = null;
+              if (partialBlob_ != null) {
+                subBuilder = partialBlob_.toBuilder();
               }
-              rcBlob_ = input.readMessage(exoscale.blockstorage.BSStore.RefCountedBlob.parser(), extensionRegistry);
+              partialBlob_ = input.readMessage(exoscale.sos.BlobProto.PartialBlob.parser(), extensionRegistry);
               if (subBuilder != null) {
-                subBuilder.mergeFrom(rcBlob_);
-                rcBlob_ = subBuilder.buildPartial();
+                subBuilder.mergeFrom(partialBlob_);
+                partialBlob_ = subBuilder.buildPartial();
               }
 
               break;
             }
             case 16: {
-
-              blobOffset_ = input.readInt64();
-              break;
-            }
-            case 24: {
-
-              blobSize_ = input.readInt64();
-              break;
-            }
-            case 32: {
 
               extentOffset_ = input.readInt64();
               break;
@@ -855,66 +843,54 @@ public final class BSStore {
               exoscale.blockstorage.BSStore.BlobView.class, exoscale.blockstorage.BSStore.BlobView.Builder.class);
     }
 
-    public static final int RCBLOB_FIELD_NUMBER = 1;
-    private exoscale.blockstorage.BSStore.RefCountedBlob rcBlob_;
-    /**
-     * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-     * @return Whether the rcBlob field is set.
-     */
-    @java.lang.Override
-    public boolean hasRcBlob() {
-      return rcBlob_ != null;
-    }
-    /**
-     * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-     * @return The rcBlob.
-     */
-    @java.lang.Override
-    public exoscale.blockstorage.BSStore.RefCountedBlob getRcBlob() {
-      return rcBlob_ == null ? exoscale.blockstorage.BSStore.RefCountedBlob.getDefaultInstance() : rcBlob_;
-    }
-    /**
-     * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-     */
-    @java.lang.Override
-    public exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder getRcBlobOrBuilder() {
-      return getRcBlob();
-    }
-
-    public static final int BLOBOFFSET_FIELD_NUMBER = 2;
-    private long blobOffset_;
+    public static final int PARTIALBLOB_FIELD_NUMBER = 1;
+    private exoscale.sos.BlobProto.PartialBlob partialBlob_;
     /**
      * <pre>
-     * Offset into the referenced Blob
+     * Blob ids are {partition,id}
+     * the Blob itself is id+size, might as well store the whole thing
+     * PartialBlob is blob+offset+length
      * </pre>
      *
-     * <code>int64 blobOffset = 2 [json_name = "blobOffset"];</code>
-     * @return The blobOffset.
+     * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+     * @return Whether the partialBlob field is set.
      */
     @java.lang.Override
-    public long getBlobOffset() {
-      return blobOffset_;
+    public boolean hasPartialBlob() {
+      return partialBlob_ != null;
     }
-
-    public static final int BLOBSIZE_FIELD_NUMBER = 3;
-    private long blobSize_;
     /**
      * <pre>
-     * Size to consider from the offset
+     * Blob ids are {partition,id}
+     * the Blob itself is id+size, might as well store the whole thing
+     * PartialBlob is blob+offset+length
      * </pre>
      *
-     * <code>int64 blobSize = 3 [json_name = "blobSize"];</code>
-     * @return The blobSize.
+     * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+     * @return The partialBlob.
      */
     @java.lang.Override
-    public long getBlobSize() {
-      return blobSize_;
+    public exoscale.sos.BlobProto.PartialBlob getPartialBlob() {
+      return partialBlob_ == null ? exoscale.sos.BlobProto.PartialBlob.getDefaultInstance() : partialBlob_;
+    }
+    /**
+     * <pre>
+     * Blob ids are {partition,id}
+     * the Blob itself is id+size, might as well store the whole thing
+     * PartialBlob is blob+offset+length
+     * </pre>
+     *
+     * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+     */
+    @java.lang.Override
+    public exoscale.sos.BlobProto.PartialBlobOrBuilder getPartialBlobOrBuilder() {
+      return getPartialBlob();
     }
 
-    public static final int EXTENTOFFSET_FIELD_NUMBER = 4;
+    public static final int EXTENTOFFSET_FIELD_NUMBER = 2;
     private long extentOffset_;
     /**
-     * <code>int64 extentOffset = 4 [json_name = "extentOffset"];</code>
+     * <code>int64 extentOffset = 2 [json_name = "extentOffset"];</code>
      * @return The extentOffset.
      */
     @java.lang.Override
@@ -936,17 +912,11 @@ public final class BSStore {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
-      if (rcBlob_ != null) {
-        output.writeMessage(1, getRcBlob());
-      }
-      if (blobOffset_ != 0L) {
-        output.writeInt64(2, blobOffset_);
-      }
-      if (blobSize_ != 0L) {
-        output.writeInt64(3, blobSize_);
+      if (partialBlob_ != null) {
+        output.writeMessage(1, getPartialBlob());
       }
       if (extentOffset_ != 0L) {
-        output.writeInt64(4, extentOffset_);
+        output.writeInt64(2, extentOffset_);
       }
       unknownFields.writeTo(output);
     }
@@ -957,21 +927,13 @@ public final class BSStore {
       if (size != -1) return size;
 
       size = 0;
-      if (rcBlob_ != null) {
+      if (partialBlob_ != null) {
         size += com.google.protobuf.CodedOutputStream
-          .computeMessageSize(1, getRcBlob());
-      }
-      if (blobOffset_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(2, blobOffset_);
-      }
-      if (blobSize_ != 0L) {
-        size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(3, blobSize_);
+          .computeMessageSize(1, getPartialBlob());
       }
       if (extentOffset_ != 0L) {
         size += com.google.protobuf.CodedOutputStream
-          .computeInt64Size(4, extentOffset_);
+          .computeInt64Size(2, extentOffset_);
       }
       size += unknownFields.getSerializedSize();
       memoizedSize = size;
@@ -988,15 +950,11 @@ public final class BSStore {
       }
       exoscale.blockstorage.BSStore.BlobView other = (exoscale.blockstorage.BSStore.BlobView) obj;
 
-      if (hasRcBlob() != other.hasRcBlob()) return false;
-      if (hasRcBlob()) {
-        if (!getRcBlob()
-            .equals(other.getRcBlob())) return false;
+      if (hasPartialBlob() != other.hasPartialBlob()) return false;
+      if (hasPartialBlob()) {
+        if (!getPartialBlob()
+            .equals(other.getPartialBlob())) return false;
       }
-      if (getBlobOffset()
-          != other.getBlobOffset()) return false;
-      if (getBlobSize()
-          != other.getBlobSize()) return false;
       if (getExtentOffset()
           != other.getExtentOffset()) return false;
       if (!unknownFields.equals(other.unknownFields)) return false;
@@ -1010,16 +968,10 @@ public final class BSStore {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
-      if (hasRcBlob()) {
-        hash = (37 * hash) + RCBLOB_FIELD_NUMBER;
-        hash = (53 * hash) + getRcBlob().hashCode();
+      if (hasPartialBlob()) {
+        hash = (37 * hash) + PARTIALBLOB_FIELD_NUMBER;
+        hash = (53 * hash) + getPartialBlob().hashCode();
       }
-      hash = (37 * hash) + BLOBOFFSET_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getBlobOffset());
-      hash = (37 * hash) + BLOBSIZE_FIELD_NUMBER;
-      hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
-          getBlobSize());
       hash = (37 * hash) + EXTENTOFFSET_FIELD_NUMBER;
       hash = (53 * hash) + com.google.protobuf.Internal.hashLong(
           getExtentOffset());
@@ -1156,16 +1108,12 @@ public final class BSStore {
       @java.lang.Override
       public Builder clear() {
         super.clear();
-        if (rcBlobBuilder_ == null) {
-          rcBlob_ = null;
+        if (partialBlobBuilder_ == null) {
+          partialBlob_ = null;
         } else {
-          rcBlob_ = null;
-          rcBlobBuilder_ = null;
+          partialBlob_ = null;
+          partialBlobBuilder_ = null;
         }
-        blobOffset_ = 0L;
-
-        blobSize_ = 0L;
-
         extentOffset_ = 0L;
 
         return this;
@@ -1194,13 +1142,11 @@ public final class BSStore {
       @java.lang.Override
       public exoscale.blockstorage.BSStore.BlobView buildPartial() {
         exoscale.blockstorage.BSStore.BlobView result = new exoscale.blockstorage.BSStore.BlobView(this);
-        if (rcBlobBuilder_ == null) {
-          result.rcBlob_ = rcBlob_;
+        if (partialBlobBuilder_ == null) {
+          result.partialBlob_ = partialBlob_;
         } else {
-          result.rcBlob_ = rcBlobBuilder_.build();
+          result.partialBlob_ = partialBlobBuilder_.build();
         }
-        result.blobOffset_ = blobOffset_;
-        result.blobSize_ = blobSize_;
         result.extentOffset_ = extentOffset_;
         onBuilt();
         return result;
@@ -1250,14 +1196,8 @@ public final class BSStore {
 
       public Builder mergeFrom(exoscale.blockstorage.BSStore.BlobView other) {
         if (other == exoscale.blockstorage.BSStore.BlobView.getDefaultInstance()) return this;
-        if (other.hasRcBlob()) {
-          mergeRcBlob(other.getRcBlob());
-        }
-        if (other.getBlobOffset() != 0L) {
-          setBlobOffset(other.getBlobOffset());
-        }
-        if (other.getBlobSize() != 0L) {
-          setBlobSize(other.getBlobSize());
+        if (other.hasPartialBlob()) {
+          mergePartialBlob(other.getPartialBlob());
         }
         if (other.getExtentOffset() != 0L) {
           setExtentOffset(other.getExtentOffset());
@@ -1291,214 +1231,182 @@ public final class BSStore {
         return this;
       }
 
-      private exoscale.blockstorage.BSStore.RefCountedBlob rcBlob_;
+      private exoscale.sos.BlobProto.PartialBlob partialBlob_;
       private com.google.protobuf.SingleFieldBuilderV3<
-          exoscale.blockstorage.BSStore.RefCountedBlob, exoscale.blockstorage.BSStore.RefCountedBlob.Builder, exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder> rcBlobBuilder_;
+          exoscale.sos.BlobProto.PartialBlob, exoscale.sos.BlobProto.PartialBlob.Builder, exoscale.sos.BlobProto.PartialBlobOrBuilder> partialBlobBuilder_;
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-       * @return Whether the rcBlob field is set.
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+       * @return Whether the partialBlob field is set.
        */
-      public boolean hasRcBlob() {
-        return rcBlobBuilder_ != null || rcBlob_ != null;
+      public boolean hasPartialBlob() {
+        return partialBlobBuilder_ != null || partialBlob_ != null;
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
-       * @return The rcBlob.
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
+       * @return The partialBlob.
        */
-      public exoscale.blockstorage.BSStore.RefCountedBlob getRcBlob() {
-        if (rcBlobBuilder_ == null) {
-          return rcBlob_ == null ? exoscale.blockstorage.BSStore.RefCountedBlob.getDefaultInstance() : rcBlob_;
+      public exoscale.sos.BlobProto.PartialBlob getPartialBlob() {
+        if (partialBlobBuilder_ == null) {
+          return partialBlob_ == null ? exoscale.sos.BlobProto.PartialBlob.getDefaultInstance() : partialBlob_;
         } else {
-          return rcBlobBuilder_.getMessage();
+          return partialBlobBuilder_.getMessage();
         }
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
        */
-      public Builder setRcBlob(exoscale.blockstorage.BSStore.RefCountedBlob value) {
-        if (rcBlobBuilder_ == null) {
+      public Builder setPartialBlob(exoscale.sos.BlobProto.PartialBlob value) {
+        if (partialBlobBuilder_ == null) {
           if (value == null) {
             throw new NullPointerException();
           }
-          rcBlob_ = value;
+          partialBlob_ = value;
           onChanged();
         } else {
-          rcBlobBuilder_.setMessage(value);
+          partialBlobBuilder_.setMessage(value);
         }
 
         return this;
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
        */
-      public Builder setRcBlob(
-          exoscale.blockstorage.BSStore.RefCountedBlob.Builder builderForValue) {
-        if (rcBlobBuilder_ == null) {
-          rcBlob_ = builderForValue.build();
+      public Builder setPartialBlob(
+          exoscale.sos.BlobProto.PartialBlob.Builder builderForValue) {
+        if (partialBlobBuilder_ == null) {
+          partialBlob_ = builderForValue.build();
           onChanged();
         } else {
-          rcBlobBuilder_.setMessage(builderForValue.build());
+          partialBlobBuilder_.setMessage(builderForValue.build());
         }
 
         return this;
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
        */
-      public Builder mergeRcBlob(exoscale.blockstorage.BSStore.RefCountedBlob value) {
-        if (rcBlobBuilder_ == null) {
-          if (rcBlob_ != null) {
-            rcBlob_ =
-              exoscale.blockstorage.BSStore.RefCountedBlob.newBuilder(rcBlob_).mergeFrom(value).buildPartial();
+      public Builder mergePartialBlob(exoscale.sos.BlobProto.PartialBlob value) {
+        if (partialBlobBuilder_ == null) {
+          if (partialBlob_ != null) {
+            partialBlob_ =
+              exoscale.sos.BlobProto.PartialBlob.newBuilder(partialBlob_).mergeFrom(value).buildPartial();
           } else {
-            rcBlob_ = value;
+            partialBlob_ = value;
           }
           onChanged();
         } else {
-          rcBlobBuilder_.mergeFrom(value);
+          partialBlobBuilder_.mergeFrom(value);
         }
 
         return this;
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
        */
-      public Builder clearRcBlob() {
-        if (rcBlobBuilder_ == null) {
-          rcBlob_ = null;
+      public Builder clearPartialBlob() {
+        if (partialBlobBuilder_ == null) {
+          partialBlob_ = null;
           onChanged();
         } else {
-          rcBlob_ = null;
-          rcBlobBuilder_ = null;
+          partialBlob_ = null;
+          partialBlobBuilder_ = null;
         }
 
         return this;
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
        */
-      public exoscale.blockstorage.BSStore.RefCountedBlob.Builder getRcBlobBuilder() {
+      public exoscale.sos.BlobProto.PartialBlob.Builder getPartialBlobBuilder() {
         
         onChanged();
-        return getRcBlobFieldBuilder().getBuilder();
+        return getPartialBlobFieldBuilder().getBuilder();
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
        */
-      public exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder getRcBlobOrBuilder() {
-        if (rcBlobBuilder_ != null) {
-          return rcBlobBuilder_.getMessageOrBuilder();
+      public exoscale.sos.BlobProto.PartialBlobOrBuilder getPartialBlobOrBuilder() {
+        if (partialBlobBuilder_ != null) {
+          return partialBlobBuilder_.getMessageOrBuilder();
         } else {
-          return rcBlob_ == null ?
-              exoscale.blockstorage.BSStore.RefCountedBlob.getDefaultInstance() : rcBlob_;
+          return partialBlob_ == null ?
+              exoscale.sos.BlobProto.PartialBlob.getDefaultInstance() : partialBlob_;
         }
       }
       /**
-       * <code>.exoscale.blockstorage.RefCountedBlob rcBlob = 1 [json_name = "rcBlob"];</code>
+       * <pre>
+       * Blob ids are {partition,id}
+       * the Blob itself is id+size, might as well store the whole thing
+       * PartialBlob is blob+offset+length
+       * </pre>
+       *
+       * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
        */
       private com.google.protobuf.SingleFieldBuilderV3<
-          exoscale.blockstorage.BSStore.RefCountedBlob, exoscale.blockstorage.BSStore.RefCountedBlob.Builder, exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder> 
-          getRcBlobFieldBuilder() {
-        if (rcBlobBuilder_ == null) {
-          rcBlobBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
-              exoscale.blockstorage.BSStore.RefCountedBlob, exoscale.blockstorage.BSStore.RefCountedBlob.Builder, exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder>(
-                  getRcBlob(),
+          exoscale.sos.BlobProto.PartialBlob, exoscale.sos.BlobProto.PartialBlob.Builder, exoscale.sos.BlobProto.PartialBlobOrBuilder> 
+          getPartialBlobFieldBuilder() {
+        if (partialBlobBuilder_ == null) {
+          partialBlobBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              exoscale.sos.BlobProto.PartialBlob, exoscale.sos.BlobProto.PartialBlob.Builder, exoscale.sos.BlobProto.PartialBlobOrBuilder>(
+                  getPartialBlob(),
                   getParentForChildren(),
                   isClean());
-          rcBlob_ = null;
+          partialBlob_ = null;
         }
-        return rcBlobBuilder_;
-      }
-
-      private long blobOffset_ ;
-      /**
-       * <pre>
-       * Offset into the referenced Blob
-       * </pre>
-       *
-       * <code>int64 blobOffset = 2 [json_name = "blobOffset"];</code>
-       * @return The blobOffset.
-       */
-      @java.lang.Override
-      public long getBlobOffset() {
-        return blobOffset_;
-      }
-      /**
-       * <pre>
-       * Offset into the referenced Blob
-       * </pre>
-       *
-       * <code>int64 blobOffset = 2 [json_name = "blobOffset"];</code>
-       * @param value The blobOffset to set.
-       * @return This builder for chaining.
-       */
-      public Builder setBlobOffset(long value) {
-        
-        blobOffset_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Offset into the referenced Blob
-       * </pre>
-       *
-       * <code>int64 blobOffset = 2 [json_name = "blobOffset"];</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearBlobOffset() {
-        
-        blobOffset_ = 0L;
-        onChanged();
-        return this;
-      }
-
-      private long blobSize_ ;
-      /**
-       * <pre>
-       * Size to consider from the offset
-       * </pre>
-       *
-       * <code>int64 blobSize = 3 [json_name = "blobSize"];</code>
-       * @return The blobSize.
-       */
-      @java.lang.Override
-      public long getBlobSize() {
-        return blobSize_;
-      }
-      /**
-       * <pre>
-       * Size to consider from the offset
-       * </pre>
-       *
-       * <code>int64 blobSize = 3 [json_name = "blobSize"];</code>
-       * @param value The blobSize to set.
-       * @return This builder for chaining.
-       */
-      public Builder setBlobSize(long value) {
-        
-        blobSize_ = value;
-        onChanged();
-        return this;
-      }
-      /**
-       * <pre>
-       * Size to consider from the offset
-       * </pre>
-       *
-       * <code>int64 blobSize = 3 [json_name = "blobSize"];</code>
-       * @return This builder for chaining.
-       */
-      public Builder clearBlobSize() {
-        
-        blobSize_ = 0L;
-        onChanged();
-        return this;
+        return partialBlobBuilder_;
       }
 
       private long extentOffset_ ;
       /**
-       * <code>int64 extentOffset = 4 [json_name = "extentOffset"];</code>
+       * <code>int64 extentOffset = 2 [json_name = "extentOffset"];</code>
        * @return The extentOffset.
        */
       @java.lang.Override
@@ -1506,7 +1414,7 @@ public final class BSStore {
         return extentOffset_;
       }
       /**
-       * <code>int64 extentOffset = 4 [json_name = "extentOffset"];</code>
+       * <code>int64 extentOffset = 2 [json_name = "extentOffset"];</code>
        * @param value The extentOffset to set.
        * @return This builder for chaining.
        */
@@ -1517,7 +1425,7 @@ public final class BSStore {
         return this;
       }
       /**
-       * <code>int64 extentOffset = 4 [json_name = "extentOffset"];</code>
+       * <code>int64 extentOffset = 2 [json_name = "extentOffset"];</code>
        * @return This builder for chaining.
        */
       public Builder clearExtentOffset() {
@@ -2746,7 +2654,33 @@ public final class BSStore {
 
     /**
      * <pre>
-     * RefCountedBlob _RefCountedBlob = 1; // nested
+     * nested
+     * </pre>
+     *
+     * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+     * @return Whether the refCountedBlob field is set.
+     */
+    boolean hasRefCountedBlob();
+    /**
+     * <pre>
+     * nested
+     * </pre>
+     *
+     * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+     * @return The refCountedBlob.
+     */
+    exoscale.blockstorage.BSStore.RefCountedBlob getRefCountedBlob();
+    /**
+     * <pre>
+     * nested
+     * </pre>
+     *
+     * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+     */
+    exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder getRefCountedBlobOrBuilder();
+
+    /**
+     * <pre>
      * BlobView       _BlobView       = 2; // nested
      * </pre>
      *
@@ -2756,7 +2690,6 @@ public final class BSStore {
     boolean hasExtent();
     /**
      * <pre>
-     * RefCountedBlob _RefCountedBlob = 1; // nested
      * BlobView       _BlobView       = 2; // nested
      * </pre>
      *
@@ -2766,7 +2699,6 @@ public final class BSStore {
     exoscale.blockstorage.BSStore.Extent getExtent();
     /**
      * <pre>
-     * RefCountedBlob _RefCountedBlob = 1; // nested
      * BlobView       _BlobView       = 2; // nested
      * </pre>
      *
@@ -2824,6 +2756,19 @@ public final class BSStore {
             case 0:
               done = true;
               break;
+            case 10: {
+              exoscale.blockstorage.BSStore.RefCountedBlob.Builder subBuilder = null;
+              if (RefCountedBlob_ != null) {
+                subBuilder = RefCountedBlob_.toBuilder();
+              }
+              RefCountedBlob_ = input.readMessage(exoscale.blockstorage.BSStore.RefCountedBlob.parser(), extensionRegistry);
+              if (subBuilder != null) {
+                subBuilder.mergeFrom(RefCountedBlob_);
+                RefCountedBlob_ = subBuilder.buildPartial();
+              }
+
+              break;
+            }
             case 26: {
               exoscale.blockstorage.BSStore.Extent.Builder subBuilder = null;
               if (Extent_ != null) {
@@ -2869,11 +2814,48 @@ public final class BSStore {
               exoscale.blockstorage.BSStore.RecordTypeUnion.class, exoscale.blockstorage.BSStore.RecordTypeUnion.Builder.class);
     }
 
+    public static final int _REFCOUNTEDBLOB_FIELD_NUMBER = 1;
+    private exoscale.blockstorage.BSStore.RefCountedBlob RefCountedBlob_;
+    /**
+     * <pre>
+     * nested
+     * </pre>
+     *
+     * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+     * @return Whether the refCountedBlob field is set.
+     */
+    @java.lang.Override
+    public boolean hasRefCountedBlob() {
+      return RefCountedBlob_ != null;
+    }
+    /**
+     * <pre>
+     * nested
+     * </pre>
+     *
+     * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+     * @return The refCountedBlob.
+     */
+    @java.lang.Override
+    public exoscale.blockstorage.BSStore.RefCountedBlob getRefCountedBlob() {
+      return RefCountedBlob_ == null ? exoscale.blockstorage.BSStore.RefCountedBlob.getDefaultInstance() : RefCountedBlob_;
+    }
+    /**
+     * <pre>
+     * nested
+     * </pre>
+     *
+     * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+     */
+    @java.lang.Override
+    public exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder getRefCountedBlobOrBuilder() {
+      return getRefCountedBlob();
+    }
+
     public static final int _EXTENT_FIELD_NUMBER = 3;
     private exoscale.blockstorage.BSStore.Extent Extent_;
     /**
      * <pre>
-     * RefCountedBlob _RefCountedBlob = 1; // nested
      * BlobView       _BlobView       = 2; // nested
      * </pre>
      *
@@ -2886,7 +2868,6 @@ public final class BSStore {
     }
     /**
      * <pre>
-     * RefCountedBlob _RefCountedBlob = 1; // nested
      * BlobView       _BlobView       = 2; // nested
      * </pre>
      *
@@ -2899,7 +2880,6 @@ public final class BSStore {
     }
     /**
      * <pre>
-     * RefCountedBlob _RefCountedBlob = 1; // nested
      * BlobView       _BlobView       = 2; // nested
      * </pre>
      *
@@ -2924,6 +2904,9 @@ public final class BSStore {
     @java.lang.Override
     public void writeTo(com.google.protobuf.CodedOutputStream output)
                         throws java.io.IOException {
+      if (RefCountedBlob_ != null) {
+        output.writeMessage(1, getRefCountedBlob());
+      }
       if (Extent_ != null) {
         output.writeMessage(3, getExtent());
       }
@@ -2936,6 +2919,10 @@ public final class BSStore {
       if (size != -1) return size;
 
       size = 0;
+      if (RefCountedBlob_ != null) {
+        size += com.google.protobuf.CodedOutputStream
+          .computeMessageSize(1, getRefCountedBlob());
+      }
       if (Extent_ != null) {
         size += com.google.protobuf.CodedOutputStream
           .computeMessageSize(3, getExtent());
@@ -2955,6 +2942,11 @@ public final class BSStore {
       }
       exoscale.blockstorage.BSStore.RecordTypeUnion other = (exoscale.blockstorage.BSStore.RecordTypeUnion) obj;
 
+      if (hasRefCountedBlob() != other.hasRefCountedBlob()) return false;
+      if (hasRefCountedBlob()) {
+        if (!getRefCountedBlob()
+            .equals(other.getRefCountedBlob())) return false;
+      }
       if (hasExtent() != other.hasExtent()) return false;
       if (hasExtent()) {
         if (!getExtent()
@@ -2971,6 +2963,10 @@ public final class BSStore {
       }
       int hash = 41;
       hash = (19 * hash) + getDescriptor().hashCode();
+      if (hasRefCountedBlob()) {
+        hash = (37 * hash) + _REFCOUNTEDBLOB_FIELD_NUMBER;
+        hash = (53 * hash) + getRefCountedBlob().hashCode();
+      }
       if (hasExtent()) {
         hash = (37 * hash) + _EXTENT_FIELD_NUMBER;
         hash = (53 * hash) + getExtent().hashCode();
@@ -3113,6 +3109,12 @@ public final class BSStore {
       @java.lang.Override
       public Builder clear() {
         super.clear();
+        if (RefCountedBlobBuilder_ == null) {
+          RefCountedBlob_ = null;
+        } else {
+          RefCountedBlob_ = null;
+          RefCountedBlobBuilder_ = null;
+        }
         if (ExtentBuilder_ == null) {
           Extent_ = null;
         } else {
@@ -3145,6 +3147,11 @@ public final class BSStore {
       @java.lang.Override
       public exoscale.blockstorage.BSStore.RecordTypeUnion buildPartial() {
         exoscale.blockstorage.BSStore.RecordTypeUnion result = new exoscale.blockstorage.BSStore.RecordTypeUnion(this);
+        if (RefCountedBlobBuilder_ == null) {
+          result.RefCountedBlob_ = RefCountedBlob_;
+        } else {
+          result.RefCountedBlob_ = RefCountedBlobBuilder_.build();
+        }
         if (ExtentBuilder_ == null) {
           result.Extent_ = Extent_;
         } else {
@@ -3198,6 +3205,9 @@ public final class BSStore {
 
       public Builder mergeFrom(exoscale.blockstorage.BSStore.RecordTypeUnion other) {
         if (other == exoscale.blockstorage.BSStore.RecordTypeUnion.getDefaultInstance()) return this;
+        if (other.hasRefCountedBlob()) {
+          mergeRefCountedBlob(other.getRefCountedBlob());
+        }
         if (other.hasExtent()) {
           mergeExtent(other.getExtent());
         }
@@ -3230,12 +3240,166 @@ public final class BSStore {
         return this;
       }
 
+      private exoscale.blockstorage.BSStore.RefCountedBlob RefCountedBlob_;
+      private com.google.protobuf.SingleFieldBuilderV3<
+          exoscale.blockstorage.BSStore.RefCountedBlob, exoscale.blockstorage.BSStore.RefCountedBlob.Builder, exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder> RefCountedBlobBuilder_;
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       * @return Whether the refCountedBlob field is set.
+       */
+      public boolean hasRefCountedBlob() {
+        return RefCountedBlobBuilder_ != null || RefCountedBlob_ != null;
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       * @return The refCountedBlob.
+       */
+      public exoscale.blockstorage.BSStore.RefCountedBlob getRefCountedBlob() {
+        if (RefCountedBlobBuilder_ == null) {
+          return RefCountedBlob_ == null ? exoscale.blockstorage.BSStore.RefCountedBlob.getDefaultInstance() : RefCountedBlob_;
+        } else {
+          return RefCountedBlobBuilder_.getMessage();
+        }
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       */
+      public Builder setRefCountedBlob(exoscale.blockstorage.BSStore.RefCountedBlob value) {
+        if (RefCountedBlobBuilder_ == null) {
+          if (value == null) {
+            throw new NullPointerException();
+          }
+          RefCountedBlob_ = value;
+          onChanged();
+        } else {
+          RefCountedBlobBuilder_.setMessage(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       */
+      public Builder setRefCountedBlob(
+          exoscale.blockstorage.BSStore.RefCountedBlob.Builder builderForValue) {
+        if (RefCountedBlobBuilder_ == null) {
+          RefCountedBlob_ = builderForValue.build();
+          onChanged();
+        } else {
+          RefCountedBlobBuilder_.setMessage(builderForValue.build());
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       */
+      public Builder mergeRefCountedBlob(exoscale.blockstorage.BSStore.RefCountedBlob value) {
+        if (RefCountedBlobBuilder_ == null) {
+          if (RefCountedBlob_ != null) {
+            RefCountedBlob_ =
+              exoscale.blockstorage.BSStore.RefCountedBlob.newBuilder(RefCountedBlob_).mergeFrom(value).buildPartial();
+          } else {
+            RefCountedBlob_ = value;
+          }
+          onChanged();
+        } else {
+          RefCountedBlobBuilder_.mergeFrom(value);
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       */
+      public Builder clearRefCountedBlob() {
+        if (RefCountedBlobBuilder_ == null) {
+          RefCountedBlob_ = null;
+          onChanged();
+        } else {
+          RefCountedBlob_ = null;
+          RefCountedBlobBuilder_ = null;
+        }
+
+        return this;
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       */
+      public exoscale.blockstorage.BSStore.RefCountedBlob.Builder getRefCountedBlobBuilder() {
+        
+        onChanged();
+        return getRefCountedBlobFieldBuilder().getBuilder();
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       */
+      public exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder getRefCountedBlobOrBuilder() {
+        if (RefCountedBlobBuilder_ != null) {
+          return RefCountedBlobBuilder_.getMessageOrBuilder();
+        } else {
+          return RefCountedBlob_ == null ?
+              exoscale.blockstorage.BSStore.RefCountedBlob.getDefaultInstance() : RefCountedBlob_;
+        }
+      }
+      /**
+       * <pre>
+       * nested
+       * </pre>
+       *
+       * <code>.exoscale.blockstorage.RefCountedBlob _RefCountedBlob = 1 [json_name = "RefCountedBlob"];</code>
+       */
+      private com.google.protobuf.SingleFieldBuilderV3<
+          exoscale.blockstorage.BSStore.RefCountedBlob, exoscale.blockstorage.BSStore.RefCountedBlob.Builder, exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder> 
+          getRefCountedBlobFieldBuilder() {
+        if (RefCountedBlobBuilder_ == null) {
+          RefCountedBlobBuilder_ = new com.google.protobuf.SingleFieldBuilderV3<
+              exoscale.blockstorage.BSStore.RefCountedBlob, exoscale.blockstorage.BSStore.RefCountedBlob.Builder, exoscale.blockstorage.BSStore.RefCountedBlobOrBuilder>(
+                  getRefCountedBlob(),
+                  getParentForChildren(),
+                  isClean());
+          RefCountedBlob_ = null;
+        }
+        return RefCountedBlobBuilder_;
+      }
+
       private exoscale.blockstorage.BSStore.Extent Extent_;
       private com.google.protobuf.SingleFieldBuilderV3<
           exoscale.blockstorage.BSStore.Extent, exoscale.blockstorage.BSStore.Extent.Builder, exoscale.blockstorage.BSStore.ExtentOrBuilder> ExtentBuilder_;
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3247,7 +3411,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3263,7 +3426,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3284,7 +3446,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3303,7 +3464,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3326,7 +3486,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3345,7 +3504,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3358,7 +3516,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3374,7 +3531,6 @@ public final class BSStore {
       }
       /**
        * <pre>
-       * RefCountedBlob _RefCountedBlob = 1; // nested
        * BlobView       _BlobView       = 2; // nested
        * </pre>
        *
@@ -3479,18 +3635,19 @@ public final class BSStore {
       "pc.proto\032\037google/protobuf/timestamp.prot" +
       "o\"T\n\016RefCountedBlob\022&\n\004blob\030\001 \001(\0132\022.exos" +
       "cale.sos.BlobR\004blob\022\032\n\010refcount\030\002 \001(\005R\010r" +
-      "efcount\"\251\001\n\010BlobView\022=\n\006rcBlob\030\001 \001(\0132%.e" +
-      "xoscale.blockstorage.RefCountedBlobR\006rcB" +
-      "lob\022\036\n\nblobOffset\030\002 \001(\003R\nblobOffset\022\032\n\010b" +
-      "lobSize\030\003 \001(\003R\010blobSize\022\"\n\014extentOffset\030" +
-      "\004 \001(\003R\014extentOffset\"\233\001\n\006Extent\022\022\n\004uuid\030\001" +
-      " \001(\tR\004uuid\022\036\n\ndiskOffset\030\002 \001(\003R\ndiskOffs" +
-      "et\022=\n\tblobViews\030\003 \003(\0132\037.exoscale.blockst" +
-      "orage.BlobViewR\tblobViews\022\036\n\nisSnapshot\030" +
-      "\004 \001(\010R\nisSnapshot\"I\n\017RecordTypeUnion\0226\n\007" +
-      "_Extent\030\003 \001(\0132\035.exoscale.blockstorage.Ex" +
-      "tentR\006ExtentB1B\007BSStoreZ&github.com/exos" +
-      "cale/blockstorage/protob\006proto3"
+      "efcount\"k\n\010BlobView\022;\n\013partialBlob\030\001 \001(\013" +
+      "2\031.exoscale.sos.PartialBlobR\013partialBlob" +
+      "\022\"\n\014extentOffset\030\002 \001(\003R\014extentOffset\"\233\001\n" +
+      "\006Extent\022\022\n\004uuid\030\001 \001(\tR\004uuid\022\036\n\ndiskOffse" +
+      "t\030\002 \001(\003R\ndiskOffset\022=\n\tblobViews\030\003 \003(\0132\037" +
+      ".exoscale.blockstorage.BlobViewR\tblobVie" +
+      "ws\022\036\n\nisSnapshot\030\004 \001(\010R\nisSnapshot\"\231\001\n\017R" +
+      "ecordTypeUnion\022N\n\017_RefCountedBlob\030\001 \001(\0132" +
+      "%.exoscale.blockstorage.RefCountedBlobR\016" +
+      "RefCountedBlob\0226\n\007_Extent\030\003 \001(\0132\035.exosca" +
+      "le.blockstorage.ExtentR\006ExtentB1B\007BSStor" +
+      "eZ&github.com/exoscale/blockstorage/prot" +
+      "ob\006proto3"
     };
     descriptor = com.google.protobuf.Descriptors.FileDescriptor
       .internalBuildGeneratedFileFrom(descriptorData,
@@ -3509,7 +3666,7 @@ public final class BSStore {
     internal_static_exoscale_blockstorage_BlobView_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_exoscale_blockstorage_BlobView_descriptor,
-        new java.lang.String[] { "RcBlob", "BlobOffset", "BlobSize", "ExtentOffset", });
+        new java.lang.String[] { "PartialBlob", "ExtentOffset", });
     internal_static_exoscale_blockstorage_Extent_descriptor =
       getDescriptor().getMessageTypes().get(2);
     internal_static_exoscale_blockstorage_Extent_fieldAccessorTable = new
@@ -3521,7 +3678,7 @@ public final class BSStore {
     internal_static_exoscale_blockstorage_RecordTypeUnion_fieldAccessorTable = new
       com.google.protobuf.GeneratedMessageV3.FieldAccessorTable(
         internal_static_exoscale_blockstorage_RecordTypeUnion_descriptor,
-        new java.lang.String[] { "Extent", });
+        new java.lang.String[] { "RefCountedBlob", "Extent", });
     exoscale.sos.BlobProto.getDescriptor();
     com.google.protobuf.TimestampProto.getDescriptor();
   }

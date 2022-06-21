@@ -28,7 +28,8 @@
            exoscale.blockstorage.BSStore$Extent
            exoscale.blockstorage.BSStore$ExtentOrBuilder
            [exoscale.blockstorage BSStore$RefCountedBlob BSStore$RefCountedBlobOrBuilder BSStore$BlobViewOrBuilder BSStore$ExtentOrBuilder BSStore$RefCountedBlob$Builder BSStore$BlobView$Builder BSStore$Extent$Builder]
-           [java.util UUID]))
+           [java.util UUID]
+           [exoscale.sos BlobProto$PartialBlob BlobProto$PartialBlobOrBuilder]))
 
 
 (defprotocol RecordParser
@@ -72,6 +73,14 @@
     (.setSize b (int size))
     (.build b)))
 
+(defn ^BlobProto$PartialBlob partial-blob->record
+  [{::blob/keys [blob offset length]}]
+  (-> (BlobProto$PartialBlob/newBuilder)
+    (.setBlob (blob->record blob))
+    (.setOffset (int offset))
+    (.setLength (int length))
+    (.build)))
+
 (defn ^BSStore$RefCountedBlob rcblob->record
   "Serialize an refcounted blob to protobuf"
   [{::rcblob/keys [blob refcount] :as rcblob}]
@@ -83,12 +92,10 @@
 
 (defn ^BSStore$BlobView blobview->record
   "Serialize an refcounted blob to protobuf"
-  [{::blobview/keys [rcblob blob-offset blob-size extent-offset] :as blobview}]
+  [{::blobview/keys [partial-blob extent-offset] :as blobview}]
   (ex/assert-spec-valid ::blockstorage/blobview blobview)
   (let [b (BSStore$BlobView/newBuilder)]
-    (.setRcBlob b (rcblob->record rcblob))
-    (.setBlobOffset b blob-offset)
-    (.setBlobSize b blob-size)
+    (.setPartialBlob b (partial-blob->record partial-blob))
     (.setExtentOffset b extent-offset)
     (.build b)))
 
@@ -112,16 +119,23 @@
   get serialized transitively."
   [record-type m]
   (case record-type
-    ;; :RefCountedBlob (rcblob->record m)
+    :RefCountedBlob (rcblob->record m)
     ;; :BlobView (blobview->record m)
     :Extent (extent->record m)))
 
 (defn record->blob
   "Protobuf blob to a blob map"
   [^BlobProto$BlobOrBuilder payload]
-  #::blob{:partition (.getPartition payload)
-          :id        (.getBlobId payload)
+  #::blob{:id        (.getBlobId payload)
+          :partition (.getPartition payload)
           :size      (.getSize payload)})
+
+(defn record->partial-blob
+  "Protobuf blob to a blob map"
+  [^BlobProto$PartialBlob payload]
+  #::blob{:blob   (record->blob (.getBlob payload))
+          :offset (.getOffset payload)
+          :length (.getLength payload)})
 
 (defn record->rcblob
   "Protobuf inode to an inode map"
@@ -131,9 +145,7 @@
 
 (defn record->blobview
   [^BSStore$BlobViewOrBuilder payload]
-  #::extent{::rcblob        (record->rcblob (.getRcBlob payload))
-            ::blob-offset   (.getBlobOffset payload)
-            ::blob-size     (.getBlobSize payload)
+  #::extent{::partial-blob  (record->partial-blob (.getPartialBlob payload))
             ::extent-offset (.getExtentOffset payload)})
 
 (defn record->extent

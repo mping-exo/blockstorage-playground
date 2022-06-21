@@ -100,20 +100,10 @@ func (m *BlobView) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 	if m.ExtentOffset != 0 {
 		i = encodeVarint(dAtA, i, uint64(m.ExtentOffset))
 		i--
-		dAtA[i] = 0x20
-	}
-	if m.BlobSize != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.BlobSize))
-		i--
-		dAtA[i] = 0x18
-	}
-	if m.BlobOffset != 0 {
-		i = encodeVarint(dAtA, i, uint64(m.BlobOffset))
-		i--
 		dAtA[i] = 0x10
 	}
-	if m.RcBlob != nil {
-		size, err := m.RcBlob.MarshalToSizedBufferVT(dAtA[:i])
+	if m.PartialBlob != nil {
+		size, err := m.PartialBlob.MarshalToSizedBufferVT(dAtA[:i])
 		if err != nil {
 			return 0, err
 		}
@@ -232,6 +222,16 @@ func (m *RecordTypeUnion) MarshalToSizedBufferVT(dAtA []byte) (int, error) {
 		i--
 		dAtA[i] = 0x1a
 	}
+	if m.XRefCountedBlob != nil {
+		size, err := m.XRefCountedBlob.MarshalToSizedBufferVT(dAtA[:i])
+		if err != nil {
+			return 0, err
+		}
+		i -= size
+		i = encodeVarint(dAtA, i, uint64(size))
+		i--
+		dAtA[i] = 0xa
+	}
 	return len(dAtA) - i, nil
 }
 
@@ -271,15 +271,9 @@ func (m *BlobView) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
-	if m.RcBlob != nil {
-		l = m.RcBlob.SizeVT()
+	if m.PartialBlob != nil {
+		l = m.PartialBlob.SizeVT()
 		n += 1 + l + sov(uint64(l))
-	}
-	if m.BlobOffset != 0 {
-		n += 1 + sov(uint64(m.BlobOffset))
-	}
-	if m.BlobSize != 0 {
-		n += 1 + sov(uint64(m.BlobSize))
 	}
 	if m.ExtentOffset != 0 {
 		n += 1 + sov(uint64(m.ExtentOffset))
@@ -324,6 +318,10 @@ func (m *RecordTypeUnion) SizeVT() (n int) {
 	}
 	var l int
 	_ = l
+	if m.XRefCountedBlob != nil {
+		l = m.XRefCountedBlob.SizeVT()
+		n += 1 + l + sov(uint64(l))
+	}
 	if m.XExtent != nil {
 		l = m.XExtent.SizeVT()
 		n += 1 + l + sov(uint64(l))
@@ -477,7 +475,7 @@ func (m *BlobView) UnmarshalVT(dAtA []byte) error {
 		switch fieldNum {
 		case 1:
 			if wireType != 2 {
-				return fmt.Errorf("proto: wrong wireType = %d for field RcBlob", wireType)
+				return fmt.Errorf("proto: wrong wireType = %d for field PartialBlob", wireType)
 			}
 			var msglen int
 			for shift := uint(0); ; shift += 7 {
@@ -504,52 +502,14 @@ func (m *BlobView) UnmarshalVT(dAtA []byte) error {
 			if postIndex > l {
 				return io.ErrUnexpectedEOF
 			}
-			if m.RcBlob == nil {
-				m.RcBlob = &RefCountedBlob{}
+			if m.PartialBlob == nil {
+				m.PartialBlob = &proto.PartialBlob{}
 			}
-			if err := m.RcBlob.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+			if err := m.PartialBlob.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
 				return err
 			}
 			iNdEx = postIndex
 		case 2:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BlobOffset", wireType)
-			}
-			m.BlobOffset = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BlobOffset |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 3:
-			if wireType != 0 {
-				return fmt.Errorf("proto: wrong wireType = %d for field BlobSize", wireType)
-			}
-			m.BlobSize = 0
-			for shift := uint(0); ; shift += 7 {
-				if shift >= 64 {
-					return ErrIntOverflow
-				}
-				if iNdEx >= l {
-					return io.ErrUnexpectedEOF
-				}
-				b := dAtA[iNdEx]
-				iNdEx++
-				m.BlobSize |= int64(b&0x7F) << shift
-				if b < 0x80 {
-					break
-				}
-			}
-		case 4:
 			if wireType != 0 {
 				return fmt.Errorf("proto: wrong wireType = %d for field ExtentOffset", wireType)
 			}
@@ -775,6 +735,42 @@ func (m *RecordTypeUnion) UnmarshalVT(dAtA []byte) error {
 			return fmt.Errorf("proto: RecordTypeUnion: illegal tag %d (wire type %d)", fieldNum, wire)
 		}
 		switch fieldNum {
+		case 1:
+			if wireType != 2 {
+				return fmt.Errorf("proto: wrong wireType = %d for field XRefCountedBlob", wireType)
+			}
+			var msglen int
+			for shift := uint(0); ; shift += 7 {
+				if shift >= 64 {
+					return ErrIntOverflow
+				}
+				if iNdEx >= l {
+					return io.ErrUnexpectedEOF
+				}
+				b := dAtA[iNdEx]
+				iNdEx++
+				msglen |= int(b&0x7F) << shift
+				if b < 0x80 {
+					break
+				}
+			}
+			if msglen < 0 {
+				return ErrInvalidLength
+			}
+			postIndex := iNdEx + msglen
+			if postIndex < 0 {
+				return ErrInvalidLength
+			}
+			if postIndex > l {
+				return io.ErrUnexpectedEOF
+			}
+			if m.XRefCountedBlob == nil {
+				m.XRefCountedBlob = &RefCountedBlob{}
+			}
+			if err := m.XRefCountedBlob.UnmarshalVT(dAtA[iNdEx:postIndex]); err != nil {
+				return err
+			}
+			iNdEx = postIndex
 		case 3:
 			if wireType != 2 {
 				return fmt.Errorf("proto: wrong wireType = %d for field XExtent", wireType)

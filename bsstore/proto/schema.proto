@@ -13,10 +13,11 @@ message RefCountedBlob {
 }
 
 message BlobView {
-  exoscale.sos.Blob blob = 1; // Blob reference
-  int64 blobOffset = 2; // Offset into the referenced Blob
-  int64 blobSize = 3; // Size to consider from the offset
-  int64 extentOffset = 4;
+  // Blob ids are {partition,id}
+  // the Blob itself is id+size, might as well store the whole thing
+  // PartialBlob is blob+offset+length
+  exoscale.sos.PartialBlob partialBlob = 1;
+  int64 extentOffset = 2;
 }
 
 message Extent {
@@ -31,7 +32,7 @@ message Extent {
  * top level message in an union.
  */
 message RecordTypeUnion {
-  RefCountedBlob _RefCountedBlob = 1;
-  // BlobView       _BlobView       = 2; // nested inside Extent
+  RefCountedBlob _RefCountedBlob = 1; // nested
+  // BlobView       _BlobView       = 2; // nested
   Extent         _Extent         = 3;
 }

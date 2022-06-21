@@ -1,16 +1,12 @@
 (ns exoscale.entity.blockstorage.blobview
   (:require [clojure.spec.alpha :as s]
-            [exoscale.entity.blockstorage.rcblob :as rcblob]
+            [exoscale.entity.sos.blob :as blob]
             [exoscale.entity.blockstorage.spec :as spec]))
 
-(s/def ::rcblob ::rcblob/rcblob)
-(s/def ::blob-offset ::spec/offset)
-(s/def ::blob-size ::spec/offset)
+(s/def ::partial-blob ::blob/partial)
 (s/def ::extent-offset ::spec/offset)
-(s/def ::blobview (s/keys :req [::rcblob ::blob-offset ::blob-size ::extent-offset]))
+(s/def ::blobview (s/keys :req [::partial-blob ::extent-offset]))
 
-(defn make-blobview [rcblob blob-offset blob-size extent-offset]
-  {::rcblob        rcblob
-   ::blob-offset   blob-offset
-   ::blob-size     blob-size
+(defn make-blobview [partial-blob extent-offset]
+  {::partial-blob  partial-blob
    ::extent-offset extent-offset})

@@ -15,7 +15,7 @@
              (bsstore/make-bsstore)
              (component/start)))
 
-(def uuid (UUID/randomUUID))
+(def uuid (str (UUID/randomUUID)))
 
 
 (query/build-query
@@ -37,11 +37,17 @@
   @(bs/-run-in-transaction store
      (fn [s] (extent/-get-by-offset s uuid 10)))
 
+  @(store/long-range-reduce (:db store) conj [] :Extent [(str uuid) nil])
+
+  @(extent/-long-range-reduce store conj [] uuid)
+
+  ;(bs/-reduce-extents store uuid conj [] {:max-keys 100})
+
   @(bs/-run-in-transaction store
      (fn [s] (extent/-get-all s)))
 
   (bs/-run-in-transaction store
     (fn [s]
-      (extent/-insert s (extent/make-extent uuid 10 []))))
+      (extent/-insert s (extent/make-extent uuid (rand-int 1000) []))))
 
   "")

@@ -31,8 +31,7 @@
    {:primary-key [:concat :type-key
                   "uuid"
                   "diskOffset"]
-    :indices     [{:name "uuid"
-                   :on   :uuid}]}})
+    :schema      schema}})
 
 (defrecord VinylMetastore [store])
 
@@ -51,6 +50,8 @@
      (store/list-query (:store this)
        (query/build-query :Extent [:and [:= :uuid uuid]])
        {::store/transform p/parse-record})))
+  (-long-range-reduce [this f val start-uuid]
+    (store/long-range-reduce (:db this) f val :Extent [(str start-uuid) nil]))
   (-insert [this extent]
     (store/insert-record (:store this)
       (p/map->record :Extent extent))))
@@ -101,16 +102,20 @@
     (assoc this :db nil))
   bs/AtomicMetastore
   (-run-in-transaction [_ f]
-    (do                                                     ;with-span-attrs "metastore/run-in-transaction" {:nest? false :attrs {:function (function->str f)}}
+    (do ;with-span-attrs "metastore/run-in-transaction" {:nest? false :attrs {:function (function->str f)}}
       (run-store-fn db f)))
-  (-reduce-extents [_ uuid reducer init opts]
-    (do                                                     ;with-span-attrs "metastore/reduce-keys" {:nest? false}
-      (store/long-range-transduce db
-        (map p/parse-record)
-        (completing reducer)
-        init
-        :Extent [uuid]
-        (scan-properties opts)))))
+  (-long-range-reduce [this f val record-type items]
+    (store/long-range-reduce (:db this) f val record-type items))
+  (-long-query-reduce [this f val query]
+    (bs/-long-query-reduce this f val query {}))
+  (-long-query-reduce[this f val query opts]
+    (do  ;with-span-attrs "metastore/-long-query-reduce" {:nest? false :attrs {:query query}}
+      (store/long-query-reduce (:db this) f val (query/build-query query) opts)))
+  (-long-query-reduce[this f val query filter opts]
+     (do  ;with-span-attrs "metastore/-long-query-reduce" {:nest? false :attrs {:query query}}
+       (store/long-query-reduce (:db this) f val (query/build-query query filter) opts))))
+
+
 
 (defn make-bsstore
   "A store configured for holding object storage metadata. Implements the

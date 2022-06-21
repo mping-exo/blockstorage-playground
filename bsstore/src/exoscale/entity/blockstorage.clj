@@ -8,13 +8,19 @@
 (s/def ::blobview ::bv/blobview)
 (s/def ::extent ::ex/extent)
 
-(defprotocol ^:no-doc AtomicMetastore
+(defprotocol AtomicMetastore
   "The main protocol the underlying transactables should implement"
-  (-reduce-extents [this uuid reducer init opts]
-    "Reduce over extents with a transformation of f(xf).")
-  (-run-in-transaction [this f]
+  (-run-in-transaction
+    [this f]
     "Run `f` over an implementation of all known metadata protocols:
-     - `extent/ExtentStore`"))
+     - `extent/ExtentStore`")
+  (-long-range-reduce [this f val record-type items]
+    "Long range reducer")
+  (-long-query-reduce
+    [this f val query]
+    [this f val query opts]
+    [this f val query filter opts]
+    "Runs a long query reducer via `f` with initial val `val`, with optional query `filter` and `opts`"))
 
 (defmacro with-transaction
   "Perform provided in the context of a transaction against the store"

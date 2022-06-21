@@ -33,15 +33,11 @@ func (x *BlobView) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 		return nil
 	}
 
-	if obj, ok := interface{}(x.RcBlob).(zapcore.ObjectMarshaler); ok {
-		enc.AddObject("rcBlob", obj)
+	if obj, ok := interface{}(x.PartialBlob).(zapcore.ObjectMarshaler); ok {
+		enc.AddObject("partialBlob", obj)
 	} else {
-		enc.AddReflected("rcBlob", x.RcBlob)
+		enc.AddReflected("partialBlob", x.PartialBlob)
 	}
-
-	enc.AddInt64("blobOffset", x.BlobOffset)
-
-	enc.AddInt64("blobSize", x.BlobSize)
 
 	enc.AddInt64("extentOffset", x.ExtentOffset)
 
@@ -79,6 +75,12 @@ func (x *Extent) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 func (x *RecordTypeUnion) MarshalLogObject(enc zapcore.ObjectEncoder) error {
 	if x == nil {
 		return nil
+	}
+
+	if obj, ok := interface{}(x.XRefCountedBlob).(zapcore.ObjectMarshaler); ok {
+		enc.AddObject("_RefCountedBlob", obj)
+	} else {
+		enc.AddReflected("_RefCountedBlob", x.XRefCountedBlob)
 	}
 
 	if obj, ok := interface{}(x.XExtent).(zapcore.ObjectMarshaler); ok {

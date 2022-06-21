@@ -21,7 +21,9 @@
 
 (defprotocol ^:no-doc ExtentStore
   "Extent Metadata store"
-  (-get-by-offset [store uuid disk-offset])
+  (-get-by-offset [store uuid disk-offset] "Gets an extent by its PK")
   (-get-all [store]
-    [store uuid])
-  (-insert [store extent]))
+            [store uuid]
+    "Gets all extends, optionally for a given UUID")
+  (-long-range-reduce [store f val start-uuid] "Long range reduce `f` with initial `val` over extends with `start-uuid` uuid")
+  (-insert [store extent] "Inserts an extent"))

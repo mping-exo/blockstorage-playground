@@ -56,6 +56,7 @@
                  [com.fasterxml.jackson.core/jackson-core ~jackson-version]
                  [com.fasterxml.jackson.datatype/jackson-datatype-jsr310 ~jackson-version]
                  [com.fasterxml.jackson.core/jackson-annotations ~jackson-version]]
+  :profiles {:dev {:dependencies [[criterium "0.4.6"]]}}
   :repositories {"exoscale" {:url "https://artifacts.exoscale.ch"}}
   :repl-options {:init-ns bsstore.core}
   :aliases {"compile" ["do" "javac," "compile," "check"]}
