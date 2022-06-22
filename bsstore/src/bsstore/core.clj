@@ -1,6 +1,7 @@
 (ns bsstore.core
   (:require [exoscale.entity.blockstorage :as bs]
             [exoscale.entity.blockstorage.extent :as extent]
+            [exoscale.entity.blockstorage.rcblob :as rcblob]
             [exoscale.blockstorage.bsstore :as bsstore]
             [exoscale.vinyl.store :as store]
             [exoscale.vinyl.query :as query]
@@ -24,6 +25,15 @@
            [:= :diskOffset 10]])
 
 (comment
+  (bs/-run-in-transaction store
+    (fn [s]
+      (rcblob/-get-by-id s 1 1)))
+
+  (bs/-run-in-transaction store
+    (fn [s]
+      (rcblob/-insert s
+        #:exoscale.entity.blockstorage.rcblob{:blob     #:exoscale.entity.sos.blob{:id 1, :partition 1, :size 1829548},
+                                              :refcount 5267984})))
 
   @(bs/-run-in-transaction store
      (fn [s]

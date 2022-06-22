@@ -172,7 +172,7 @@
   FDBRecord
   (parse-record [r]
     (parse-record (RecordInfo. (-> r .getRecordType .getName) (.getRecord r))))
-  BSStore$RefCountedBlob
+  BSStore$RefCountedBlobOrBuilder
   (parse-record [r] (record->rcblob r))
   BSStore$BlobViewOrBuilder
   (parse-record [r] (record->blobview r))

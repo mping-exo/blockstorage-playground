@@ -9,3 +9,9 @@
 (defn make-rcblob [blob refcount]
   {::blob     blob
    ::refcount refcount})
+
+
+(defprotocol ^:no-doc RcBlobStore
+  "RefCountedBlob Metadata store"
+  (-get-by-id [store partition-id blob-id] "Gets an RefCountedBlob by its PK")
+  (-insert [store rcblob] "Inserts an RefCountedBlob"))

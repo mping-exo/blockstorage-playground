@@ -2,21 +2,27 @@
   (:gen-class)
   (:require [exoscale.entity.blockstorage :as bs]
             [exoscale.entity.blockstorage.extent :as extent]
+            [exoscale.entity.blockstorage.rcblob :as rcblob]
             [exoscale.blockstorage.bsstore :as bsstore]
-            [exoscale.vinyl.store :as store]
-            [exoscale.vinyl.query :as query]
-            [exoscale.blockstorage.bsstore.payload :as p]
             [com.stuartsierra.component :as component]
             [clojure.spec.alpha :as s]
             [clojure.spec.gen.alpha :as g])
   (:use [criterium.core])
-  (:import [java.util UUID]))
+  (:import [java.util UUID]
+           [com.apple.foundationdb.record.provider.foundationdb RecordAlreadyExistsException]))
 
 (defn- insert-extent-tx [store exts]
   (bs/-run-in-transaction store
     (fn [s]
       (doseq [ext exts]
-        (extent/-insert s ext)))))
+        (let [blobs (extent/blobs ext)]
+          (println "- Inserting blobs:" (count blobs))
+          (doseq [blob blobs]
+            (let [rcblob (rcblob/make-rcblob blob 1)]
+              (try
+                (rcblob/-insert s rcblob)
+                (catch RecordAlreadyExistsException _))))
+          (extent/-insert s ext))))))
 
 (def ^:private extent-generator (s/gen ::extent/extent))
 (def fixed-uuid (UUID/randomUUID))
@@ -32,15 +38,15 @@
                 (bsstore/make-bsstore)
                 (component/start))
         batch 10
-        rounds 100
+        rounds 1000
         total (atom 0)]
     (dotimes [round rounds]
       (let [s (* round batch)
             e (+ s batch)]
-        (println "Inserting  100 random extents [" s "," e "]")
+        (println "Inserting 100 random extents [" s "=>" e "] in batches of" batch)
         (insert-extent-tx store (mapv (fn [offset] (rand-extent fixed-uuid offset))
                                       (range s e)))
-        (swap! total + (* rounds batch))))
+        (swap! total + batch)))
     (println "Inserted total of" @total "Extents")))
 
 
@@ -63,5 +69,4 @@
                   :cluster-file "/etc/foundationdb/fdb.cluster"}
                (bsstore/make-bsstore)
                (component/start)))
-
   (run-load-test))

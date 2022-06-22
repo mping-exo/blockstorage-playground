@@ -8,17 +8,24 @@
             [exoscale.entity.blockstorage :as bs]
             [exoscale.blockstorage.bsstore.payload :as p]
             [exoscale.entity.blockstorage.extent :as extent]
+            [exoscale.entity.blockstorage.rcblob :as rcblob]
             [exoscale.vinyl.query :as query]
             [exoscale.vinyl.store :as store]
             [telemetric-clj.macros :refer [with-span-attrs]])
   (:import exoscale.blockstorage.BSStore))
 
 ;; TODO use params?
-(defn ^:no-doc ^:private extents-by-uuid-and-offset [uuid disk-offset]
+(defn ^:private extents-by-uuid-and-offset [uuid disk-offset]
   (query/build-query
     :Extent [:and
              [:= :uuid (str uuid)]
              [:= :diskOffset disk-offset]]))
+
+(def ^:private parts-by-upload-q
+  (query/build-query
+    :RefCountedBlob [:and
+                     [:= :bucket :bucket] [:= :upload_id :upload-id]
+                     [:in :partno :part-numbers]]))
 
 ;; First we define primary keys and indices for the metastore
 (def ^:private schema
@@ -36,6 +43,13 @@
 (defrecord VinylMetastore [store])
 
 (extend-type VinylMetastore
+  rcblob/RcBlobStore
+  (-get-by-id [this partition-id blob-id]
+    (some-> (store/load-record (:store this) :RefCountedBlob [partition-id blob-id])
+            (p/parse-record)))
+  (-insert [this rcblob]
+    (store/insert-record (:store this) (p/map->record :RefCountedBlob rcblob)))
+
   extent/ExtentStore
   (-get-by-offset [this uuid disk-offset]
     (store/list-query (:store this)
