@@ -29,6 +29,7 @@
   (-get-by-offset [store uuid disk-offset] "Gets an extent by its PK")
   (-get-all [store]
     [store uuid]
-    "Gets all extends, optionally for a given UUID")
-  (-long-range-reduce [store f val start-uuid] "Long range reduce `f` with initial `val` over extends with `start-uuid` uuid")
+    "Gets all extents, optionally for a given UUID")
+  (-reduce-by-offset [store f val start-uuid offset length]
+    "Gets all extents between [offset, offset+length]")
   (-insert [store extent] "Inserts an extent"))
