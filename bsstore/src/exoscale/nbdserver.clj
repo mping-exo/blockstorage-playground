@@ -5,8 +5,18 @@
             [aleph.http :as http])
   (:import [java.io File RandomAccessFile DataOutputStream DataInputStream Closeable BufferedOutputStream]
            [java.net ServerSocket Socket]
-           [com.google.common.primitives Longs UnsignedLong UnsignedInteger]))
+           [com.google.common.primitives Longs UnsignedLong UnsignedInteger Ints]))
+;;;;
+;; nbd constants
+(def ^"[B" INIT_PASSWD (.getBytes "NBDMAGIC"))
+(def ^"[B" OPTS_MAGIC_BYTES (Longs/toByteArray 5280542401877725268))
+(def NBD_REQUEST_MAGIC 0x25609513)
+(def NBD_REPLY_MAGIC_BYTES (Ints/toByteArray 1732535960))
+(def NBD_OK_BYTES (byte-array 4))
 
+(def NBD_FLAG_HAS_FLAGS (bit-shift-left 1 0))
+(def NBD_FLAG_SEND_FLUSH (bit-shift-left 1 2))
+(def NBD_FLAG_SEND_TRIM (bit-shift-left 1 5))
 
 
 (defprotocol NBDImpl
@@ -18,8 +28,18 @@
   (nbd-flush [this handle din dout])
   (nbd-cache [this handle din dout]))
 
-;; real impl
-(defn- -read [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len offset])
+;; real impl, no bounds check :D
+(defn- -read [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len offset]
+  (let [buffer (byte-array len)]
+    (locking raf
+      (.seek raf offset)
+      (.read raf buffer))
+    (.write dout NBD_REPLY_MAGIC_BYTES)
+    (.write dout NBD_OK_BYTES)
+    (.writeLong dout handle)
+    (.write dout buffer)
+    (.flush dout)))
+
 (defn- -write [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len ^Long offset])
 (defn- -trim [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len ^Long offset])
 (defn- -flush [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout])
@@ -34,17 +54,14 @@
   (nbd-flush [this handle din dout] (-flush this handle din dout))
   (nbd-cache [this handle din dout] (-cache raf handle din dout)))
 
-;;;;
-;; nbd proto
 
-(def ^"[B" INIT_PASSWD (.getBytes "NBDMAGIC"))
-(def ^"[B" OPTS_MAGIC_BYTES (Longs/toByteArray 5280542401877725268))
-(def NBD_REQUEST_MAGIC 0x25609513)
+(defn- make-file-impl [size]
+  (let [f    (File/createTempFile "clj-nbd-server" ".file")
+        raf  (RandomAccessFile. f "rw")]
+    (.setLength raf size)
+    (->NbdFileImpl size raf)))
 
-(def NBD_FLAG_HAS_FLAGS (bit-shift-left 1 0))
-(def NBD_FLAG_SEND_FLUSH (bit-shift-left 1 2))
-(def NBD_FLAG_SEND_TRIM (bit-shift-left 1 5))
-
+;; oldstyle "negotiation": take it or leave it
 (defn- handshake [^DataInputStream din ^DataOutputStream dout]
   ;; S: 64 bits, 0x4e42444d41474943 (ASCII 'NBDMAGIC') (also known as the INIT_PASSWD)
   ;; S: 64 bits, 0x00420281861253 (cliserv_magic, a magic number)
@@ -71,7 +88,6 @@
            4 :trim
            5 :cache})
 
-;; OLDSTYLE
 (defn- handle-connections [^ServerSocket ss impl]
   (let [socket  (.accept ss)
         handle? (atom true)]
@@ -100,6 +116,7 @@
                   reqlen  (UnsignedInteger/fromIntBits (.readInt din))
                   cmdname (get cmds cmd)]
 
+              ;; dispatch
               (condp = cmdname
                 :read (nbd-read impl handle din dout reqlen offset)
                 :write (nbd-write impl handle din dout reqlen offset)
@@ -139,10 +156,7 @@
       (reset! (:listen this) false))))
 
 (defn make-nbd-server [size]
-  (let [f    (File/createTempFile "clj-nbd-server" ".file")
-        raf  (RandomAccessFile. f "rw")
-        impl (->NbdFileImpl size raf)]
-    (->NBDServer size impl)))
+  (->NBDServer size (make-file-impl size)))
 
 (def server (make-nbd-server (* 1024 1024 1024)))
 
