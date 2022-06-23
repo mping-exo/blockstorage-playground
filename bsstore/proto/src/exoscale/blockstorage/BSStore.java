@@ -712,8 +712,8 @@ public final class BSStore {
     /**
      * <pre>
      * Blob ids are {partition,id}
-     * the Blob itself is id+size, might as well store the whole thing
-     * PartialBlob is blob+offset+length
+     * the Blob itself is id+size, we are saving the whole thing
+     * but we only need partition+blobid
      * </pre>
      *
      * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -723,8 +723,8 @@ public final class BSStore {
     /**
      * <pre>
      * Blob ids are {partition,id}
-     * the Blob itself is id+size, might as well store the whole thing
-     * PartialBlob is blob+offset+length
+     * the Blob itself is id+size, we are saving the whole thing
+     * but we only need partition+blobid
      * </pre>
      *
      * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -734,8 +734,8 @@ public final class BSStore {
     /**
      * <pre>
      * Blob ids are {partition,id}
-     * the Blob itself is id+size, might as well store the whole thing
-     * PartialBlob is blob+offset+length
+     * the Blob itself is id+size, we are saving the whole thing
+     * but we only need partition+blobid
      * </pre>
      *
      * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -848,8 +848,8 @@ public final class BSStore {
     /**
      * <pre>
      * Blob ids are {partition,id}
-     * the Blob itself is id+size, might as well store the whole thing
-     * PartialBlob is blob+offset+length
+     * the Blob itself is id+size, we are saving the whole thing
+     * but we only need partition+blobid
      * </pre>
      *
      * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -862,8 +862,8 @@ public final class BSStore {
     /**
      * <pre>
      * Blob ids are {partition,id}
-     * the Blob itself is id+size, might as well store the whole thing
-     * PartialBlob is blob+offset+length
+     * the Blob itself is id+size, we are saving the whole thing
+     * but we only need partition+blobid
      * </pre>
      *
      * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -876,8 +876,8 @@ public final class BSStore {
     /**
      * <pre>
      * Blob ids are {partition,id}
-     * the Blob itself is id+size, might as well store the whole thing
-     * PartialBlob is blob+offset+length
+     * the Blob itself is id+size, we are saving the whole thing
+     * but we only need partition+blobid
      * </pre>
      *
      * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1237,8 +1237,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1250,8 +1250,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1267,8 +1267,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1289,8 +1289,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1309,8 +1309,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1333,8 +1333,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1353,8 +1353,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1367,8 +1367,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>
@@ -1384,8 +1384,8 @@ public final class BSStore {
       /**
        * <pre>
        * Blob ids are {partition,id}
-       * the Blob itself is id+size, might as well store the whole thing
-       * PartialBlob is blob+offset+length
+       * the Blob itself is id+size, we are saving the whole thing
+       * but we only need partition+blobid
        * </pre>
        *
        * <code>.exoscale.sos.PartialBlob partialBlob = 1 [json_name = "partialBlob"];</code>

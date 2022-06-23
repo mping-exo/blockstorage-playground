@@ -2,7 +2,8 @@
   (:require [clojure.spec.alpha :as s]
             [exoscale.entity.sos.blob :as blob]
             [exoscale.entity.blockstorage.blobview :as bv]
-            [exoscale.entity.blockstorage.spec :as spec])
+            [exoscale.entity.blockstorage.spec :as spec]
+            [exoscale.entity.blockstorage :as bs])
   (:import [java.util UUID]))
 
 (s/def ::uuid uuid?)
@@ -23,6 +24,11 @@
    ::blob-views   blob-views
    ::is-snapshot? false})
 
+(defn reduce-extents [store f val uuid start end]
+  @(bs/-long-query-reduce store f val :Extent [:and
+                                               [:= :uuid (str uuid)]
+                                               [:>= :diskOffset start]
+                                               [:<= :diskOffset (+ start end)]]))
 
 (defprotocol ^:no-doc ExtentStore
   "Extent Metadata store"
@@ -30,6 +36,5 @@
   (-get-all [store]
     [store uuid]
     "Gets all extents, optionally for a given UUID")
-  (-reduce-by-offset [store f val start-uuid offset length]
-    "Gets all extents between [offset, offset+length]")
   (-insert [store extent] "Inserts an extent"))
+

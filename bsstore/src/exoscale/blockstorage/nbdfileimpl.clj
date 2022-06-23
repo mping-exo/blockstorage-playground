@@ -9,6 +9,7 @@
     (locking raf
       (.seek raf offset)
       (.read raf buffer))
+
     (.write dout p/NBD_REPLY_MAGIC_BYTES)
     (.write dout p/NBD_OK_BYTES)
     (.writeLong dout handle)
@@ -18,10 +19,11 @@
 (defn- -write [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len ^Long offset]
   (println "[read]" offset len)
   (let [buffer (byte-array len)]
+    (.readFully din buffer)
     (locking raf
-      (.readFully din buffer)
       (.seek raf offset)
       (.write raf buffer))
+
     (.write dout p/NBD_REPLY_MAGIC_BYTES)
     (.write dout p/NBD_OK_BYTES)
     (.writeLong dout handle)
@@ -34,6 +36,7 @@
     (locking raf
       (.seek raf offset)
       (.write raf buf)))
+
   (.write dout p/NBD_REPLY_MAGIC_BYTES)
   (.write dout p/NBD_OK_BYTES)
   (.writeLong dout handle)

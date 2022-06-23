@@ -10,6 +10,12 @@
             [exoscale.entity.blockstorage.blobview :as bv]
             [exoscale.entity.sos.blob :as blob]))
 
+(defmacro safely [& body]
+  `(try
+     (do ~@body)
+     (catch Exception e#
+       (.printStackTrace e#))))
+
 (defonce pid (atom 0))
 (defonce bid (atom 0))
 
@@ -25,7 +31,8 @@
                                          (swap! pid wrap-int)
                                          0)))))
 
-(defn handle->uuid [])
+(defn handle->uuid [_] "ad6be94d-6c4c-4553-a932-0ead96443039")
+(def maxblob (* 16 1024 1024))
 
 (defn- insert-extent-tx
   "Insert an extent"
@@ -38,13 +45,20 @@
       (extent/-insert s ext))))
 
 (defn- -read [bsstore handle len offset]
+  (bs/-run-in-transaction bsstore
+    (fn [s]
+      (let [extents (extent/reduce-extents s conj [] (handle->uuid handle) offset len)]
+        (println "Got extents: " extents))))
   (println "FDBxx READ"))
 
+(defn- make-rand-blobviews [offset len]
+  [])
+
 (defn- -write [bsstore handle len offset]
-  (bs/-run-in-transaction bsstore
-    (fn [s] s))
-  (let [bvs nil; (bv/make-blobview blob)
-        ext (extent/make-extent (handle->uuid) offset bvs)])
+  (let [rand-bvs (make-rand-blobviews offset len)
+        ext      (extent/make-extent (handle->uuid handle) offset rand-bvs)]
+    (bs/-run-in-transaction bsstore
+      (fn [s] (extent/-insert s ext))))
   (println "FDBxx WRITE"))
 
 (defn- -trim [bsstore handle len offset]
@@ -55,11 +69,11 @@
   (nbd-max-size [this]
     size)
   (nbd-read [this handle din dout len offset]
-    (-read bsstore handle len offset))
+    (safely (-read bsstore handle len offset)))
   (nbd-write [this handle din dout len offset]
-    (-write bsstore handle len offset))
+    (safely (-write bsstore handle len offset)))
   (nbd-trim [this handle din dout len offset]
-    (-trim bsstore handle len offset))
+    (safely (-trim bsstore handle len offset)))
   (nbd-flush [this handle din dout])
   (nbd-cache [this handle din dout]))
 

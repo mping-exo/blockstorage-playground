@@ -1,12 +1,4 @@
-(ns exoscale.entity.blockstorage
-  (:require [clojure.spec.alpha :as s]
-            [exoscale.entity.blockstorage.extent :as ex]
-            [exoscale.entity.blockstorage.blobview :as bv]
-            [exoscale.entity.blockstorage.rcblob :as rc]))
-
-(s/def ::rcblob ::rc/rcblob)
-(s/def ::blobview ::bv/blobview)
-(s/def ::extent ::ex/extent)
+(ns exoscale.entity.blockstorage)
 
 (defprotocol AtomicMetastore
   "The main protocol the underlying transactables should implement"
@@ -18,7 +10,7 @@
     "Long range reducer")
   (-long-query-reduce
     [this f val query]
-    [this f val query opts]
+    [this f val query filter]
     [this f val query filter opts]
     "Runs a long query reducer via `f` with initial val `val`, with optional query `filter` and `opts`"))
 

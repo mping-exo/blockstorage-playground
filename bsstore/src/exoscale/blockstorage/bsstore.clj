@@ -66,13 +66,6 @@
      (store/list-query (:store this)
        (query/build-query :Extent [:and [:= :uuid uuid]])
        {::store/transform p/parse-record})))
-  (-reduce-by-offset
-    [this f val start-uuid offset length]
-    (store/long-query-reduce (:db this) f val
-      (query/build-query :Extent [:and
-                                  [:= :uuid (str start-uuid)]
-                                  [:>= :diskOffset offset]
-                                  [:<= :diskOffset (+ offset length)]])))
   (-insert [this extent]
     (store/insert-record (:store this)
       (p/map->record :Extent extent))))
@@ -129,9 +122,9 @@
     (store/long-range-reduce (:db this) f val record-type items))
   (-long-query-reduce [this f val query]
     (bs/-long-query-reduce this f val query {}))
-  (-long-query-reduce[this f val query opts]
+  (-long-query-reduce[this f val query filter]
     (do  ;with-span-attrs "metastore/-long-query-reduce" {:nest? false :attrs {:query query}}
-      (store/long-query-reduce (:db this) f val (query/build-query query) opts)))
+      (store/long-query-reduce (:db this) f val (query/build-query query filter))))
   (-long-query-reduce[this f val query filter opts]
      (do  ;with-span-attrs "metastore/-long-query-reduce" {:nest? false :attrs {:query query}}
        (store/long-query-reduce (:db this) f val (query/build-query query filter) opts))))

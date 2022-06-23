@@ -83,8 +83,8 @@ type BlobView struct {
 	unknownFields protoimpl.UnknownFields
 
 	// Blob ids are {partition,id}
-	// the Blob itself is id+size, might as well store the whole thing
-	// PartialBlob is blob+offset+length
+	// the Blob itself is id+size, we are saving the whole thing
+	// but we only need partition+blobid
 	PartialBlob  *proto.PartialBlob `protobuf:"bytes,1,opt,name=partialBlob,proto3" json:"partialBlob,omitempty"`
 	ExtentOffset int64              `protobuf:"varint,2,opt,name=extentOffset,proto3" json:"extentOffset,omitempty"`
 }

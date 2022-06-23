@@ -27,12 +27,6 @@
         #:exoscale.entity.blockstorage.rcblob{:blob     #:exoscale.entity.sos.blob{:id 1, :partition 1, :size 1829548},
                                               :refcount 5267984})))
 
-  @(store/long-query-reduce (:db store) conj [] (query/build-query
-                                                  :Extent [:and
-                                                           [:= :uuid (str uuid)]
-                                                           [:>= :diskOffset 4096]
-                                                           [:<= :diskOffset 111111]]))
-
   @(bs/-run-in-transaction store
      (fn [s] (extent/-get-by-offset s uuid 10)))
 
