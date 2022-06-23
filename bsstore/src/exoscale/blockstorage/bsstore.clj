@@ -9,6 +9,7 @@
             [exoscale.blockstorage.bsstore.payload :as p]
             [exoscale.entity.blockstorage.extent :as extent]
             [exoscale.entity.blockstorage.rcblob :as rcblob]
+            [exoscale.entity.sos.blob :as blob]
             [exoscale.vinyl.query :as query]
             [exoscale.vinyl.store :as store]
             [telemetric-clj.macros :refer [with-span-attrs]])
@@ -48,7 +49,8 @@
     (some-> (store/load-record (:store this) :RefCountedBlob [partition-id blob-id])
             (p/parse-record)))
   (-insert [this rcblob]
-    (store/insert-record (:store this) (p/map->record :RefCountedBlob rcblob)))
+    (store/insert-record (:store this)
+      (p/map->record :RefCountedBlob rcblob)))
 
   extent/ExtentStore
   (-get-by-offset [this uuid disk-offset]

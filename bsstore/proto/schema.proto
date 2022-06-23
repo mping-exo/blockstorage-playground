@@ -11,6 +11,14 @@ message RefCountedBlob {
   exoscale.sos.Blob blob = 1;
   int32 refcount = 2;
 }
+/**
+- from rpc.proto:
+message PartialBlob {
+  Blob blob    = 1;
+  int32 offset = 2;
+  int32 length = 3;
+}
+*/
 
 message BlobView {
   // Blob ids are {partition,id}
