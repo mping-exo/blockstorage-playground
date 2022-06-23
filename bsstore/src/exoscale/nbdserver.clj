@@ -1,18 +1,17 @@
 (ns exoscale.nbdserver
   "Simple NBD server, oldstyle 'negotiation'.
   Informed by https://github.com/amccurry/nbd-server.git"
-  (:require [com.stuartsierra.component :as comp]
-            [aleph.http :as http])
-  (:import [java.io File RandomAccessFile DataOutputStream DataInputStream Closeable BufferedOutputStream]
-           [java.net ServerSocket Socket]
+  (:require [com.stuartsierra.component :as comp])
+  (:import [java.io File RandomAccessFile DataOutputStream DataInputStream BufferedOutputStream]
+           [java.net ServerSocket]
            [com.google.common.primitives Longs UnsignedLong UnsignedInteger Ints]))
 ;;;;
 ;; nbd constants
 (def ^"[B" INIT_PASSWD (.getBytes "NBDMAGIC"))
 (def ^"[B" OPTS_MAGIC_BYTES (Longs/toByteArray 5280542401877725268))
 (def NBD_REQUEST_MAGIC 0x25609513)
-(def NBD_REPLY_MAGIC_BYTES (Ints/toByteArray 1732535960))
-(def NBD_OK_BYTES (byte-array 4))
+(def ^"[B" NBD_REPLY_MAGIC_BYTES (Ints/toByteArray 1732535960))
+(def ^"[B" NBD_OK_BYTES (byte-array 4))
 
 (def NBD_FLAG_HAS_FLAGS (bit-shift-left 1 0))
 (def NBD_FLAG_SEND_FLUSH (bit-shift-left 1 2))
@@ -30,6 +29,7 @@
 
 ;; real impl, no bounds check :D
 (defn- -read [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len offset]
+  (println "[read]" offset len)
   (let [buffer (byte-array len)]
     (locking raf
       (.seek raf offset)
@@ -40,10 +40,41 @@
     (.write dout buffer)
     (.flush dout)))
 
-(defn- -write [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len ^Long offset])
-(defn- -trim [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len ^Long offset])
-(defn- -flush [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout])
-(defn- -cache [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout])
+(defn- -write [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len ^Long offset]
+  (println "[read]" offset len)
+  (let [buffer (byte-array len)]
+    (locking raf
+      (.readFully din buffer)
+      (.seek raf offset)
+      (.write raf buffer))
+    (.write dout NBD_REPLY_MAGIC_BYTES)
+    (.write dout NBD_OK_BYTES)
+    (.writeLong dout handle)
+    (.flush dout)))
+
+(defn- -trim [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout ^Long len ^Long offset]
+  (println "[trim]" offset len)
+  ;; lazy: just write a big ass buffer
+  (let [buf (byte-array len)]
+    (locking raf
+      (.seek raf offset)
+      (.write raf buf)))
+  (.write dout NBD_REPLY_MAGIC_BYTES)
+  (.write dout NBD_OK_BYTES)
+  (.writeLong dout handle)
+  (.flush dout))
+
+(defn- -flush [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout]
+  (println "[flush]")
+  (locking raf
+    (.sync (.getFD raf)))
+  (.write dout NBD_REPLY_MAGIC_BYTES)
+  (.write dout NBD_OK_BYTES)
+  (.writeLong dout handle)
+  (.flush dout))
+
+(defn- -cache [^RandomAccessFile raf handle ^DataInputStream din ^DataOutputStream dout]
+  (println "[cache]"))
 
 (defrecord NbdFileImpl [size ^RandomAccessFile raf]
   NBDImpl
@@ -51,14 +82,17 @@
   (nbd-read [this handle din dout len offset] (-read raf handle din dout len offset))
   (nbd-write [this handle din dout len offset] (-write raf handle din dout len offset))
   (nbd-trim [this handle din dout len offset] (-trim raf handle din dout len offset))
-  (nbd-flush [this handle din dout] (-flush this handle din dout))
+  (nbd-flush [this handle din dout] (-flush raf handle din dout))
   (nbd-cache [this handle din dout] (-cache raf handle din dout)))
 
 
 (defn- make-file-impl [size]
   (let [f    (File/createTempFile "clj-nbd-server" ".file")
         raf  (RandomAccessFile. f "rw")]
+    (.deleteOnExit f)
     (.setLength raf size)
+
+    (println "Using backing file " (.getAbsolutePath f))
     (->NbdFileImpl size raf)))
 
 ;; oldstyle "negotiation": take it or leave it
